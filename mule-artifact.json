@@ -1,0 +1,58 @@
+{
+	"classLoaderModelLoaderDescriptor": {
+		"attributes": {
+			"exportedPackages": [
+				"com.bcbsm.si"
+			],
+			"exportedResources": [
+				"log4j2.xml",
+				"keystore-lap.jceks",
+				"keystore-dev.jceks",
+				"keystore-qa.jceks",
+				"keystore-prod.jceks",
+				"wsdl/LocateEligibility-v2.1.xsd",
+				"api/bpgetmembership.raml",
+				"wsdl/DeterEligibility.wsdl",
+				"wsdl/LocateEligHist.wsdl",
+				"mappings/CoreLogging_main_standardLogMessageFormat.dwl",
+				"mappings/CoreLogging_logApplication_buildApplicationMessage.dwl",
+				"mappings/CoreLogging_logSplunk_buildSplunkMessage.dwl",
+				"mappings/CoreLogging_logEmail_buildEmailMessage.dwl",
+				"mappings/CoreExceptionHandling_main_getErrorEntry.dwl",
+				"mappings/CoreExceptionHandling_main_createErrorMessage.dwl",
+				"mappings/CoreExceptionHandling_main_buildLogMessage.dwl",
+				"mappings/CoreExceptionHandling_main_createErrorResponse.dwl",
+				"mappings/skipNullFields.dwl",
+				"mappings/logDceRequest.dwl",
+				"mappings/logDceResponseMapping.dwl",
+				"mappings/logLdsRequest.dwl",
+				"mappings/logGroupLds.dwl",
+				"mappings/uniqueRecordPairs.dwl",
+				"mappings/uniqueRecordsVariableLds.dwl",
+				"mappings/ldsResponseMapping.dwl",
+				"mappings/finalResponseGeneration.dwl",
+				"mappings/lehRecreateRequest.dwl",
+				"mappings/lehInitialRequest.dwl",
+				"mappings/logFinalErrorPayload.dwl",
+				"mappings/invalidScenarioMapping.dwl",
+				"mappings/dceErrorMappingsFinalPayload.dwl",
+				"mappings/lehHeaderAreaLogging.dwl"
+				
+							
+			]
+		},
+		"id": "mule"
+	},
+	"minMuleVersion": "4.3.0",
+	"secureProperties": [
+		"encryptionKey",
+		"anypoint.platform.client_secret",
+		"secure::passwordToCryptoJCEKey",
+		"secure::passwordToCryptoJCEKeyStore",
+		"secure::bpldsmembershipInfo.clientSecret", 
+		"secure::passwordToTrustStore",
+		"secure::passwordToKeyStore",
+		"secure::passwordToKey",
+		"secure::security.password"
+	]
+}

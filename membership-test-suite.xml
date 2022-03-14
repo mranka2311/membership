@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="postMbrRegStatus-test-suite.xml" />
+	
+<munit:test name="membership-test-suite-membership_invalidRequest" doc:id="92602009-62c7-43a2-a287-55a4f3974c49" description="Test">
+	
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="82eb0ebe-8757-4abd-be9e-e478ec256937" >
+				<munit:variables >
+					<munit:variable key="originalPayload" value="#[readUrl('classpath://examples/membershipInvalidRequest.json','text/plain')]" mediaType="application/json" />
+				</munit:variables>
+
+
+			</munit:set-event>
+		
+</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="variable" doc:id="6af44d60-590b-47ca-ae8a-c201fc5bf563" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+vars.originalPayload]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="messageId" ><![CDATA[%dw 2.0
+output application/java
+---
+if(vars.originalPayload.headerArea.messageId != null and payload.headerArea.messageId != "") vars.originalPayload.headerArea.messageId
+else correlationId
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="ldsMembership_mainLogic" doc:id="dd16914e-50d8-4468-bc9c-a8d5a6ab7047" name="ldsMembership_mainLogic" />
+		</munit:execution>
+		<munit:validation >
+			<ee:transform doc:name="expected payload" doc:id="ac6a911b-961f-4250-adef-1ebfb8bb6111" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="expectedPayloadFromFile" ><![CDATA[%dw 2.0
+var statusResponse = readUrl("classpath://examples/membershipInvalidInputResponse.json", "application/json")
+output application/json skipNullOn="everywhere"
+---
+{
+	"systemEnvironmentCode": vars.originalPayload.headerArea.systemEnvironmentCode,
+	"messageId": vars.messageId,
+    "systemMessage": statusResponse.systemMessage
+}
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="cecb7cfc-9839-4239-a408-5e9247fee679" expression='#[output application/json --- write(payload, "application/json")]' is='#[output application/json --- MunitTools::equalTo(write(vars.expectedPayloadFromFile, "application/json"))]' />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="membership-test-suite-allBackendsPositiveRequest" doc:id="a72a1808-0e7e-4419-aa70-b6a070073756" description="Test">
+	
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="343d13af-543b-4d8d-9685-80276a8b940e" >
+				<munit:variables >
+					<munit:variable key="originalPayload" value="#[readUrl('classpath://examples/membershipPositiveRequest.json','text/plain')]" mediaType="application/json" />
+				</munit:variables>
+
+
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="mock bp lds" doc:id="2d6be4d6-94e4-4dbc-a510-c1b34e3f7863" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="6e4543cd-112d-4f79-a2ad-3f9dcd9e138f" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="HTTP_Request_bplds" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://examples/ldsPositiveResponse.json','text/plain')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="mock leh call" doc:id="d244bc42-3607-44e7-80bc-ceb84f276a14" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="call LEH Web Service" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="57038db6-1295-4fea-83cc-8526fc9c5795" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="response_leh" value="#[readUrl('classpath://examples/lehPositiveResponse.xml','text/plain')]" mediaType="application/xml" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="mock dce call" doc:id="96babf5c-9827-4cc1-a596-62b0e52bc8e5" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="0b8cbad7-dfd1-45ab-a218-a1e12b8f31d4" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="WSC_DCE" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="response_dce" value="#[readUrl('classpath://examples/dcePositiveResponse.xml','text/plain')]" mediaType="application/xml" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		
+</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="variable" doc:id="9cce20b3-e3fe-40d3-96a6-f9cf38b8717f" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+vars.originalPayload]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="messageId" ><![CDATA[%dw 2.0
+output application/java
+---
+if(vars.originalPayload.headerArea.messageId != null and payload.headerArea.messageId != "") vars.originalPayload.headerArea.messageId
+else correlationId
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="ldsMembership_mainLogic" doc:id="4e3ce9c1-e892-4d64-a1c4-55d2aac89556" name="ldsMembership_mainLogic" />
+		</munit:execution>
+		<munit:validation >
+			<ee:transform doc:name="expected payload" doc:id="f3c0a299-0002-49c3-8733-e3bfb782cee6" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="expectedPayloadFromFile" ><![CDATA[%dw 2.0
+var statusResponse = readUrl("classpath://examples/membershipPositiveResponse.json", "application/json")
+output application/json skipNullOn="everywhere"
+---
+//{
+//	"systemEnvironmentCode": vars.originalPayload.headerArea.systemEnvironmentCode,
+//	"messageId": vars.messageId,
+//    "systemMessage": statusResponse.systemMessage
+//}
+statusResponse]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="05ab85e1-f4b2-4ee8-9943-9cee68000527" expression='#[output application/json --- write(payload, "application/json")]' is='#[output application/json --- MunitTools::equalTo(write(vars.expectedPayloadFromFile, "application/json"))]' />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="membership-test-suite-membership_ldsUnavailable" doc:id="b295f69a-37a9-4805-8abf-b762524ac29d" description="Test">
+	
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="4812c0e9-ee6c-483c-887e-341bf6c04ca7" >
+				<munit:variables >
+					<munit:variable key="originalPayload" value="#[readUrl('classpath://examples/membershipPositiveRequest.json','text/plain')]" mediaType="application/json" />
+				</munit:variables>
+
+
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="mock bp lds" doc:id="7259525d-61e3-4f27-94a3-edd318a6e0b0" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="6e4543cd-112d-4f79-a2ad-3f9dcd9e138f" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="HTTP_Request_bplds" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		
+</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="variable" doc:id="786636c7-4aa4-4b17-9262-62f91087bf3d" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+vars.originalPayload]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="messageId" ><![CDATA[%dw 2.0
+output application/java
+---
+if(vars.originalPayload.headerArea.messageId != null and payload.headerArea.messageId != "") vars.originalPayload.headerArea.messageId
+else correlationId
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="ldsMembership_mainLogic" doc:id="5b23e9a2-cf15-4b63-8231-3ff46823057a" name="ldsMembership_mainLogic" />
+		</munit:execution>
+		<munit:validation >
+			<ee:transform doc:name="expected payload" doc:id="d2a1db65-f9e7-43bb-8388-7322cfed3170" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="expectedPayloadFromFile" ><![CDATA[%dw 2.0
+var statusResponse = readUrl("classpath://examples/membershipResourceUnavailable.json", "application/json")
+output application/json skipNullOn="everywhere"
+---
+{
+	"messageId": vars.messageId,
+	"systemEnvironmentCode": vars.originalPayload.headerArea.systemEnvironmentCode,
+	"systemMessage": statusResponse.systemMessage
+}
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="eda4eaef-073e-4166-af38-c0b52055b657" expression='#[output application/json --- write(payload, "application/json")]' is='#[output application/json --- MunitTools::equalTo(write(vars.expectedPayloadFromFile, "application/json"))]' />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="membership-test-suite-lehDownScenario" doc:id="9b61ec15-0fbd-4c31-86e3-b6f7c21894ac" description="Test">
+	
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="c9011683-2437-44b5-86fb-e57a8b751ea2" >
+				<munit:variables >
+					<munit:variable key="originalPayload" value="#[readUrl('classpath://examples/membershipPositiveRequest.json','text/plain')]" mediaType="application/json" />
+				</munit:variables>
+
+
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="mock bp lds" doc:id="87957760-456a-4ba4-920f-3261f32cf280" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="6e4543cd-112d-4f79-a2ad-3f9dcd9e138f" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="HTTP_Request_bplds" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://examples/ldsPositiveResponse.json','text/plain')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="mock leh call" doc:id="5082ff0a-2bea-468d-8317-c43306931d9a" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="call LEH Web Service" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="57038db6-1295-4fea-83cc-8526fc9c5795" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="WSC:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		
+</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="variable" doc:id="3f645123-1b1b-4d4c-9aa6-968b2bc968d0" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+vars.originalPayload]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="messageId" ><![CDATA[%dw 2.0
+output application/java
+---
+if(vars.originalPayload.headerArea.messageId != null and payload.headerArea.messageId != "") vars.originalPayload.headerArea.messageId
+else correlationId
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="ldsMembership_mainLogic" doc:id="a6d90b34-172a-4179-a228-dceaeb08499f" name="ldsMembership_mainLogic" />
+		</munit:execution>
+		<munit:validation >
+			<ee:transform doc:name="expected payload" doc:id="cb632db0-e7b1-40de-88ef-da620a5ba02e" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="expectedPayloadFromFile" ><![CDATA[%dw 2.0
+var statusResponse = readUrl("classpath://examples/membershipLehUnavailableResponse.json", "application/json")
+output application/json skipNullOn="everywhere"
+---
+//{
+//	"systemEnvironmentCode": vars.originalPayload.headerArea.systemEnvironmentCode,
+//	"messageId": vars.messageId,
+//    "systemMessage": statusResponse.systemMessage
+//}
+statusResponse]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b0d01884-0900-4604-b345-c50493e85c4b" expression='#[output application/json --- write(payload, "application/json")]' is='#[output application/json --- MunitTools::equalTo(write(vars.expectedPayloadFromFile, "application/json"))]' />
+		</munit:validation>
+	</munit:test>
+	<munit:test name="membership-test-suite-dceDownScenario" doc:id="68488770-bc00-4a9b-9e9f-bd8ca724d7fc" description="Test">
+	
+		<munit:behavior >
+			<munit:set-event doc:name="Set Event" doc:id="7fd73b05-d9c5-44ff-8775-0c0bbafb3621" >
+				<munit:variables >
+					<munit:variable key="originalPayload" value="#[readUrl('classpath://examples/membershipPositiveRequest.json','text/plain')]" mediaType="application/json" />
+				</munit:variables>
+
+
+			</munit:set-event>
+			<munit-tools:mock-when doc:name="mock bp lds" doc:id="0af81d78-d6a6-4a6a-b8a5-a4820d77c11d" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="6e4543cd-112d-4f79-a2ad-3f9dcd9e138f" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="HTTP_Request_bplds" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[readUrl('classpath://examples/ldsPositiveResponse.json','text/plain')]" mediaType="application/json" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="mock leh call" doc:id="0d7a13ed-a7cf-4919-b223-f3e8a3a81b39" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="call LEH Web Service" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="57038db6-1295-4fea-83cc-8526fc9c5795" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:variables >
+						<munit-tools:variable key="response_leh" value="#[readUrl('classpath://examples/lehPositiveResponse.xml','text/plain')]" mediaType="application/xml" />
+					</munit-tools:variables>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="mock dce call" doc:id="ed7d37c5-6a35-4f48-98ed-bd6ece7b5446" processor="wsc:consume">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="0b8cbad7-dfd1-45ab-a218-a1e12b8f31d4" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="WSC_DCE" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="WSC:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		
+</munit:behavior>
+		<munit:execution >
+			<ee:transform doc:name="variable" doc:id="667f0b64-4cd1-4b7f-a879-5dadd7b09c43" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+vars.originalPayload]]></ee:set-payload>
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="messageId" ><![CDATA[%dw 2.0
+output application/java
+---
+if(vars.originalPayload.headerArea.messageId != null and payload.headerArea.messageId != "") vars.originalPayload.headerArea.messageId
+else correlationId
+]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="ldsMembership_mainLogic" doc:id="daec9029-be5c-4183-a141-6794ec5e0562" name="ldsMembership_mainLogic" />
+		</munit:execution>
+		<munit:validation >
+			<ee:transform doc:name="expected payload" doc:id="4ff095c5-eb4c-42bf-bd87-356ca41a7bce" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="expectedPayloadFromFile" ><![CDATA[%dw 2.0
+var statusResponse = readUrl("classpath://examples/membershipDceDownPositiveResponse.json", "application/json")
+output application/json skipNullOn="everywhere"
+---
+//{
+//	"systemEnvironmentCode": vars.originalPayload.headerArea.systemEnvironmentCode,
+//	"messageId": vars.messageId,
+//    "systemMessage": statusResponse.systemMessage
+//}
+statusResponse]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<munit-tools:assert-that doc:name="Assert that" doc:id="7d2bc223-2735-462c-b375-acdec642d50a" expression='#[output application/json --- write(payload, "application/json")]' is='#[output application/json --- MunitTools::equalTo(write(vars.expectedPayloadFromFile, "application/json"))]' />
+		</munit:validation>
+	</munit:test>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
+</mule>
