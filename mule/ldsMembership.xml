@@ -1,0 +1,866 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<flow name="ldsMembership_mainLogic" doc:id="b84e7d73-0afb-4150-accd-73b2f13148b9" >
+		<ee:transform doc:name="creatingVariables" doc:id="a6ed0178-0f3d-44b7-bc17-930ce64fbb0c" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+ 			<ee:set-variable variableName="marker" ><![CDATA["bpgetmembership"]]></ee:set-variable>
+				<ee:set-variable variableName="sysEnvCode" ><![CDATA[%dw 2.0
+output application/json
+var sysCode = payload.headerArea.systemEnvironmentCode
+---
+(if(["PROD","QA","E2E","E2E2","E2E3","E2E4","E2E5","E2E6","E2E7","E2E8","E2E9","E2E10","SIT","SIT2","SIT3","SIT4","SIT5","SIT6","SIT7","SIT8","SIT9","SIT10","TEST","TEST2","TEST3","TEST4","TEST5","TEST6","TEST7","TEST8","TEST9","TEST10"]  contains(sysCode)) sysCode else null) default null]]></ee:set-variable>
+				<ee:set-variable variableName="propagatedSystemMessages" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+				<ee:set-variable variableName="mtvBasicAuth" ><![CDATA[%dw 2.0
+import * from dw::core::Binaries
+var mtvBasicBinary = p('security.username') ++ ':' ++ p('secure::security.password') as Binary
+output application/java
+---
+"Basic " ++ toBase64(mtvBasicBinary)]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="buildLogMessageApiRequest" doc:id="598808bd-6df8-4294-9917-d6e57e561b82">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="coreLoggingLogPayloadRequest"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest" ><![CDATA[%dw 2.0
+output application/json
+---
+{  
+	clientId: attributes.headers.client_id,
+	logLevel: "INFO",
+	messageId: vars.messageId default correlationId ,
+	name: app.name,
+	logPoint: "logging incoming request from Consumer",
+	reason: "status: logging incoming request| flow: ldsMembership_mainLogic",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: null,
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null	
+}]]></ee:set-variable>
+			
+</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="invoke CoreLogging_main" doc:id="ea84b34b-b5d0-4ff4-90e9-db8099978e1b" name="CoreLogging_main" target="CoreLoggingResponse"/>
+		<ee:transform doc:name="validating request" doc:id="97cac621-c6b1-406c-858a-bcbbe50c4a71" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="validate" ><![CDATA[%dw 2.0
+import isNumeric from dw::core::Strings
+output application/json
+---
+{
+payloadValidator: ((if(isBlank(payload.payloadArea.eid)) "eid is required." else "")) ++
+((if((!isEmpty(payload.payloadArea.eid) and (payload.payloadArea.eid contains " "))) "eid cannot have spaces." else "")) ++
+
+if ((payload.payloadArea.eid) != null and (payload.payloadArea.eid) != "" and (!isNumeric(payload.payloadArea.eid)))"eid is invalid." else ""
+
+
+
+default ""
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="validate request" doc:id="74ad579c-c589-453b-bfa2-7322834c3f2c" >
+			<when expression="!isEmpty(vars.validate.payloadValidator)">
+				<set-variable value="400" doc:name="httpStatus" doc:id="94615897-e3d9-462e-ae86-1a33cae42dc0" variableName="statusCode"/>
+				<flow-ref doc:name="ldsMembership_responseMessageHandler" doc:id="ac058ff3-3400-410c-8878-455172ead6c2" name="ldsMembership_responseMessageHandler" />
+				<ee:transform doc:name="errorResponse" doc:id="ad728449-ae4d-49a7-ac6c-53691b92f555">
+					<ee:message>
+						<ee:set-payload resource="mappings/invalidScenarioMapping.dwl" />
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.coreExceptionHandlingResponse.httpStatus]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<flow-ref doc:name="ldsMembership_mainBusinessLogic" doc:id="0c1a4fea-4067-4de7-99d9-d37e9a6421db" name="ldsMembership_mainBusinessLogic"/>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="skippingNullFields" doc:id="f1bb7014-0398-4b75-a616-555e36c352ec" >
+			<ee:message >
+				<ee:set-payload resource="mappings/skipNullFields.dwl" />
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<sub-flow name="ldsMembership_buildrequest" doc:id="0784d225-5e78-46ae-9bfb-463e5b359492">
+
+		<ee:transform doc:name="create lds request" doc:id="f8cf3724-28b8-4c2b-b91d-7d9ad6fff862">
+
+			<ee:message>
+				<ee:set-payload resource="mappings/logLdsRequest.dwl" />
+
+
+			</ee:message>
+
+			<ee:variables>
+
+			</ee:variables>
+
+		</ee:transform>
+
+		<ee:transform doc:name="buildLogMessage" doc:id="618b9cba-968e-4976-b32f-0959f37c1d30">
+
+			<ee:message>
+
+			</ee:message>
+
+			<ee:variables>
+
+				<ee:set-variable variableName="coreLoggingLogPayloadRequest"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	clientId: attributes.headers.client_id,
+	logLevel: "INFO",
+	messageId: vars.messageId  default correlationId,
+	name: app.name,
+	logPoint: "Payload Request to BP_LDSMembershipInfo API",
+	reason: "status: transformed payload to BP layer | flow: ldsMembership_buildrequest",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: "SEV4",
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null,
+}]]></ee:set-variable>
+
+			</ee:variables>
+
+		</ee:transform>
+		<flow-ref doc:name="CoreLogging_main" doc:id="80cb825e-9a26-4f4d-8346-f4a1f052032c" name="CoreLogging_main" target="CoreLoggingResponse"/>
+
+	</sub-flow>
+	<sub-flow name="ldsMembership_mainBusinessLogic" doc:id="f34fbbcc-044e-4ced-a50f-483c3a7f6cfe" >
+		<flow-ref doc:name="ldsMembership_buildrequest" doc:id="6d5bee86-729c-4fce-bf82-e291f6957a80" name="ldsMembership_buildrequest" />
+		<flow-ref doc:name="ldsMembership_callBplds" doc:id="f630e2ad-710c-4176-9b3b-601a8b90c4c8" name="ldsMembership_callBplds" />
+		<choice doc:name="check status code" doc:id="6c70ed36-344f-4417-a90b-105f44bd2841" >
+			<when expression="#[vars.statusCode == 200]">
+				<ee:transform doc:name="buildLogMessageApiRequest" doc:id="98b520c3-ee56-42e9-a953-69f4629f51c7">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="coreLoggingLogPayloadRequest"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest"><![CDATA[%dw 2.0
+output application/json
+---
+{  
+	clientId: vars.originatingAppId,
+	logLevel: "INFO",
+	messageId: vars.messageId default correlationId ,
+	name: app.name,
+	logPoint: "logging incoming response from BP_LDSMembershipInfo API",
+	reason: "status: logging BP_LDSMembershipinfo Response| flow: ldsMembership_mainLogic",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: null,
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null	
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+				<flow-ref doc:name="invoke CoreLogging_main" doc:id="4cd0fefc-1ca8-44d4-88fa-0950cbbe49c3" name="CoreLogging_main" target="CoreLoggingResponse"/>
+				<flow-ref doc:name="ldsMembership_responseMapping" doc:id="6f032720-ca2a-4c63-9406-d9e8fb0a529a" name="ldsMembership_responseMapping" />
+				<flow-ref doc:name="ldsMembership_responseMessageHandler" doc:id="83840287-6e46-48e4-ad70-4fc5ac548ab4" name="ldsMembership_responseMessageHandler" />
+				<flow-ref doc:name="ldsMembership_leh_dce_call" doc:id="29727a62-709e-4798-b2eb-60aa933750e4" name="ldsMembership_leh_dce_call"/>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="ldsMembership_responseMessageHandler" doc:id="cab057f8-a736-4c56-8d07-74b8a4158a69" name="ldsMembership_responseMessageHandler"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<sub-flow name="ldsMembership_responseMapping" doc:id="19530e55-c69c-48f2-9d76-c5bd44a574c5" >
+		<choice doc:name="lds response mapping" doc:id="99ce9014-e8e7-4dd7-851b-d64fed4bb2fd">
+					<when expression="#[(payload != null)]">
+						<ee:transform doc:name="lds system message and response mapping" doc:id="23797240-339c-48d7-860b-38e672d6d5f6">
+							<ee:message>
+							</ee:message>
+							<ee:variables>
+								<ee:set-variable variableName="ldsResp"><![CDATA[%dw 2.0
+output application/json
+var date = vars.originalPayload.payloadArea.startDate
+var eid = vars.originalPayload.payloadArea.eid
+var t = payload.payloadArea.membershipEidInfoResults filter ((if ($.contractEndDate != null)(($.contractEndDate)  > date) else (1==1))   
+and ($.eid == eid))
+---
+t map (item) ->
+item update {
+    case .sourceName if(item.sourceName == "1") -> "NASCO"
+    case .sourceName if(item.sourceName == "2") -> "LOCAL"
+    case .sourceName if(item.sourceName == "3") -> "BCN"
+    case .sourceName if(item.sourceName == "4") -> "MA"
+    case .sourceName if(item.sourceName == "5") -> "MBCC"
+}]]></ee:set-variable>
+						<ee:set-variable variableName="sysMsg_lds" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.headerArea.systemMessage]]></ee:set-variable>
+						<ee:set-variable variableName="uniqueRecordPairs" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+				<foreach doc:name="For Each (create unique fields)" doc:id="f9d45e3b-20c3-41a5-a3cb-f93b36439c4d" collection="#[vars.ldsResp]">
+					<choice doc:name="check for mbcc" doc:id="af753280-9b54-4ee7-b2e8-e776daa50af0" >
+						<when expression='#[payload.sourceName == "MBCC"]'>
+							<ee:transform doc:name="medicaidObject" doc:id="27348e88-77a6-438c-9f78-3dbfef9ea78d" >
+								<ee:message >
+								</ee:message>
+								<ee:variables >
+									<ee:set-variable variableName="medicaidObject" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	medicaidId:payload.medicaidId,
+	medicaidStateCode:payload.medicaidStateCode
+}]]></ee:set-variable>
+									<ee:set-variable variableName="medicaidGroupValue" ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	
+                              "number":"02600",
+                              "contract":{
+                                 "number":payload.contractNumber,
+                                 "source":payload.sourceName,
+                                 "subscriber":{
+                                    "ssn":payload.subscriberSSN
+                                 },
+                                 "idCardNum":payload.membershipCardNumber,
+                                 "memberId":payload.memberId,
+                                 "relationshipCode":payload.relationshipCode,
+                                 "activeCoverageInd":payload.eidContractActiveIndicator
+                              }
+        
+}]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+						</when>
+						<otherwise >
+							<ee:transform doc:name="uniqueRecordPairs" doc:id="b34caba3-5f74-420b-8ee5-117ec1077bc5">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable resource="mappings/uniqueRecordPairs.dwl" variableName="uniqueRecordPairs" />
+						</ee:variables>
+					</ee:transform>
+						</otherwise>
+					</choice>
+				</foreach>
+				<ee:transform doc:name="variables added" doc:id="0938d0ec-60d8-482d-a8ce-878dee993410">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="uniquePairsLeh" ><![CDATA[%dw 2.0
+output application/json
+var x = vars.ldsResp map (item) -> {
+"$(item.contractNumber)":item.sourceName
+}
+var channel = vars.originalPayload.payloadArea.businessChannel
+---
+(if (!isEmpty(channel))((((x distinctBy ($)) reduce ($$ ++ $)) pluck (value,key) -> {
+"contractNumber": key,
+"sourceId":value}) filter ($.sourceId == channel)) else ((((x distinctBy ($)) reduce ($$ ++ $)) pluck (value,key) -> {
+"contractNumber": key,
+"sourceId":value}))) filter ($.sourceId != "MBCC")
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<ee:transform doc:name="response mapping ldsResp" doc:id="182bd58e-845d-43ee-a0c7-f0ccdd585899">
+							<ee:message>
+							</ee:message>
+					<ee:variables >
+						<ee:set-variable resource="mappings/ldsResponseMapping.dwl" variableName="ldsPayload" />
+					</ee:variables>
+						</ee:transform>
+					</when>
+					<when expression="#[vars.statusCode == 404]">
+						<set-variable value="#[404]" doc:name="status Code" doc:id="59ad1c8f-3eaa-4024-970f-3f1e624c3f49" variableName="statusCode" />
+						<ee:transform doc:name="marker" doc:id="3064348b-1920-4e21-864e-c1706c69c593">
+					<ee:message>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="marker" ><![CDATA["sildsmbrmembership"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+					</when>
+				</choice>
+	</sub-flow>
+	<sub-flow name="ldsMembership_responseMessageHandler"
+		doc:id="c08e7f5f-be30-43fb-bab6-dfae6872d8d0">
+
+		<flow-ref doc:name="locateEligHist_errorHandling" doc:id="d417c2b9-0a85-49d4-a386-820d465ab7a9" name="locateEligHist_errorHandling"/>
+		<choice doc:name="check success"
+			doc:id="b1646f03-1cff-4e41-b159-deec48e65de2">
+
+			<when expression="#[vars.success != true]">
+
+				<ee:transform doc:name="override systemMessage code"
+					doc:id="62967996-e402-43dc-a88b-02f4014cd252">
+
+					<ee:message>
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+---
+{
+	   messageId: vars.messageId,
+	   systemEnvironmentCode: vars.originalPayload.headerArea.systemEnvironmentCode,
+	   systemMessage: if(!isEmpty(payload.systemMessage))payload.systemMessage 
+	   else [vars.coreExceptionHandlingResponse.systemMessage[0] - "subCode"]
+	   
+}]]></ee:set-payload>
+
+
+
+					</ee:message>
+
+					<ee:variables>
+
+						<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+vars.coreExceptionHandlingResponse.httpStatus]]></ee:set-variable>
+
+					</ee:variables>
+
+				</ee:transform>
+
+
+
+			</when>
+			<otherwise>
+				<ee:transform doc:name="response mapping" doc:id="79dd18b3-1785-4220-acc3-2aa9e3c5bdc8">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+						<ee:set-variable variableName="ldsFinalPayload" ><![CDATA[%dw 2.0
+output application/json skipNullOn = 'everywhere'
+---
+{
+	"headerArea": {
+		"systemEnvironmentCode": vars.originalPayload.headerArea.systemEnvironmentCode,
+		"messageId": vars.messageId,
+		"systemMessage": [{
+			source:"BP_LDSMembershipInfo",
+			code: "SUC"
+		}]
+	},
+	"payloadArea": vars.ldsPayload.payloadArea
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+
+			</otherwise>
+
+		</choice>
+		<ee:transform doc:name="buildLogMessage" doc:id="8fe9a9e4-1d2f-45af-baf5-cf44cedc5c4a">
+
+					<ee:message>
+
+					</ee:message>
+
+					<ee:variables>
+
+						<ee:set-variable variableName="coreLoggingLogMessageRequest"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	clientId: vars.originatingAppId,
+	logLevel: "INFO",
+	messageId: vars.messageId  default correlationId,
+	name: app.name,
+	logPoint: "LDS modified Response",
+	reason: "status: LDS modified Response| flow: ldsMembership_responseMessageHandler",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: "SEV4",
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null,
+}]]></ee:set-variable>
+
+						<ee:set-variable variableName="coreLoggingLogPayloadRequest"><![CDATA[%dw 2.0
+output application/json
+---
+if(!isEmpty(vars.ldsFinalPayload)) vars.ldsFinalPayload else payload
+]]></ee:set-variable>
+
+					</ee:variables>
+
+				</ee:transform>
+		<flow-ref doc:name="CoreLogging_main" doc:id="d26a4e28-2c2f-49db-ab4a-688fa7b3e15c" name="CoreLogging_main" target="CoreLoggingResponse"/>
+
+	
+</sub-flow>
+	<flow name="ldsMembership_callBplds" doc:id="0b61f75d-ee95-4aba-b42e-bcb373c39ea3">
+		<http:request method="POST" doc:name="call bp lds membership" doc:id="6e4543cd-112d-4f79-a2ad-3f9dcd9e138f" config-ref="HTTP_Request_bplds" path="${bpldsmembershipInfo.resource}" responseTimeout="${bpldsmembershipInfo.responseTimeOutMS}">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	
+	"client_secret" : p('secure::bpldsmembershipInfo.clientSecret') ,
+	"client_id" : p('bpldsmembershipInfo.clientId'),
+	"originating_appid" : vars.originatingAppId,
+	"cache-control" : vars.cacheControl,
+	"content-type" : "application/json"
+}]]]></http:headers>
+			<http:response-validator>
+				<http:success-status-code-validator values="${successCodeValidator}" />
+			</http:response-validator>
+		</http:request>
+		<ee:transform doc:name="modify payload" doc:id="3497d635-3475-406e-a35f-c2ce34767469" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(!isEmpty(payload.payloadArea))({
+	headerArea: payload.headerArea,
+	payloadArea:{"membershipEidInfoResults": payload.payloadArea map ((item) ->
+        {
+            "contractNumber": if ((!isEmpty(item.subscriberSSN)) and (item.contractNumber == item.subscriberSSN)) item.contractNumber
+            else if(!isEmpty(item.DeId))item.DeId else item.contractNumber,
+            "memberSSN": item.memberSSN,
+            "memberId":item.memberId,
+            "subscriberSSN": item.subscriberSSN,
+            "eid": item.eid,
+            "sourceId": item.sourceId,
+            "sourceName": item.sourceName,
+            "birthDate": item.birthDate,
+            "gender": item.gender,
+            "firstName": item.firstName,
+            "lastName": item.lastName,
+            "middleName": item.middleName,
+            "suffix": item.suffix,
+            "prefix": item.prefix,            
+            "groupNumberBCN": item.groupNumberBCN,
+            "groupSuffixBCN": item.groupSuffixBCN,
+            "groupNumber": item.groupNumber,
+            "groupSuffix": item.groupSuffix,
+            "relationshipCode": item.relationshipCode,
+            "membershipCardNumber": item.memberCardNumber,
+            "extent": item.extent,
+            "hibKey": item.hibKey,
+            "contractEndDate": item.contractEndDate,
+            "eidContractActiveIndicator": item.eidContractActiveIndicator,
+            "memSrcMem": item.memSrcMem,
+            "medicaidId": item.medicaidId,
+            "medicaidStateCode": item.medicaidStateCode
+        })}}) else payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="setting status code" doc:id="259c6f14-5ce2-46d5-9034-dd76e1494355">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="statusCode"><![CDATA[%dw 2.0
+output application/java
+---
+if(!isEmpty(payload.payloadArea)) 200 else attributes.statusCode]]></ee:set-variable>
+				<ee:set-variable variableName="siLdsResponse" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.payloadArea.membershipEidInfoResults  map (item) ->
+item update {
+    case .sourceName if(item.sourceName == "1") -> "NASCO"
+    case .sourceName if(item.sourceName == "2") -> "LOCAL"
+    case .sourceName if(item.sourceName == "3") -> "BCN"
+    case .sourceName if(item.sourceName == "4") -> "MA"
+    case .sourceName if(item.sourceName == "5") -> "MBCC"
+}
+
+
+
+]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		
+		<error-handler>
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a54e6865-18a2-4f12-ad9f-1834918b6e34">
+				<ee:transform doc:name="marker" doc:id="39432817-e567-4b1c-a42d-31021ce62405">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="marker"><![CDATA[%dw 2.0
+output text/plain
+---
+"bpldsmembershipinfo"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<set-variable value="#[503]" doc:name="statusCode" doc:id="69865835-7822-46b8-8b75-69923d3c8712" variableName="statusCode" />
+				<ee:transform doc:name="generate system message" doc:id="b4207230-386a-4a53-8985-9a75c82c9ac4">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+"systemMessage": [
+    {
+      "source": "bpldsmembershipinfo",
+      "code": "HTTP",
+      "additionalInfo":"Resource Unavailable."
+     }
+  ]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	
+	<sub-flow name="ldsMembership_leh_dce_call" doc:id="679e302c-86e9-4ddf-8821-f2575592bd37" >
+		<ee:transform doc:name="store dce and leh" doc:id="96d89659-ecdb-424d-b80f-8e06f6d68582" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="dceStore" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+				<ee:set-variable variableName="lehWithDceMerged" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+				<ee:set-variable variableName="completeLeh" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+				<ee:set-variable variableName="finalEligibilityHistory" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<choice doc:name="check lds system message" doc:id="23f757d8-4264-4242-854a-bd055ce32d9f">
+			<when expression='#[(vars.sysMsg_lds[0].code == "SUC") and (!isEmpty(vars.uniquePairsLeh))]'>
+				<try doc:name="Try" doc:id="544f636c-cde3-42c6-906b-1cb035814269" >
+					<foreach doc:name="For Each" doc:id="665a76c5-22de-4461-9688-f7da6f861536" collection="#[vars.uniquePairsLeh]">
+					<ee:transform doc:name="callAgain-seqNum-contractNum" doc:id="1b9bd4ad-b578-43d2-bc48-31ffcc169593">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="callAgain"><![CDATA[true]]></ee:set-variable>
+							<ee:set-variable variableName="sequenceNumber"><![CDATA[null]]></ee:set-variable>
+							<ee:set-variable variableName="ContractNumFromPair"><![CDATA[payload.contractNumber
+]]></ee:set-variable>
+								<ee:set-variable variableName="tempDceStore" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="locateEligHist_createRequest" doc:id="b1512dc6-744e-460e-ac00-bd5bf4d2874c" name="locateEligHist_createRequest" />
+					
+					<choice doc:name="check sysMsg_lehError" doc:id="eeffb409-7a40-4f4c-ab2b-8e3d1465ddec">
+						<when expression="#[vars.statusCode == 503]">
+								<raise-error doc:name="Raise error for LEH Resource unavailable" doc:id="d1396843-2bee-443a-a528-49cd46c5f233" type="LEH:UNAVAILABLE" description="LEH Web Service is unavailable"/>
+						</when>
+					</choice>
+						<choice doc:name="Check Eligibility Histry" doc:id="2c256f35-75d3-4a61-897d-0b3d4622ebca">
+					<when expression="#[!(isEmpty(vars.finalEligibilityHistory.eligibilityHistory))]">
+								<parallel-foreach doc:name="Parallel For Each" doc:id="72c9b850-d5b6-4612-b899-b87f7c4b3455" collection="#[(vars.finalEligibilityHistory.eligibilityHistory)]">
+									<flow-ref doc:name="deterEligibility_createRequest" doc:id="1d09f281-7e3a-48b6-92a0-03401f263c35" name="deterEligibility_createRequest" />
+									<ee:transform doc:name="store to payload" doc:id="55d170ab-0f4e-48f5-b89b-fb9dd8b6d12a" >
+										<ee:message >
+											<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.tempDceStore]]></ee:set-payload>
+										</ee:message>
+									</ee:transform>
+									<choice doc:name="check dce" doc:id="ecefb984-eef3-4320-a8b1-dbc7acdb1465">
+									<when expression="#[vars.statusCode == 503]">
+										<raise-error doc:name="Raise error for DCE Resource unavailable" doc:id="57e1a33c-506b-4e05-a4d0-d8aa07c76d9d" type="DCE:UNAVAILABLE" description="DCE Web Service is Unavailable" />
+									</when>
+								</choice>
+								</parallel-foreach>
+								<ee:transform doc:name="dceStore" doc:id="142bf74d-aebd-4ada-9ad0-d17cc16f377b">
+									<ee:message>
+									</ee:message>
+									<ee:variables >
+										<ee:set-variable variableName="dceStore" ><![CDATA[%dw 2.0
+output application/json
+---
+flatten(payload.payload)]]></ee:set-variable>
+									</ee:variables>
+								</ee:transform>
+								<ee:transform doc:name="nullify tempdcestore" doc:id="7dea16f8-18ee-464b-9974-f9af95e0eb5c">
+										<ee:message>
+										</ee:message>
+										<ee:variables>
+											<ee:set-variable variableName="tempDceStore"><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+										</ee:variables>
+									</ee:transform>
+					</when>
+				</choice>
+						<ee:transform doc:name="merge" doc:id="93a4b8c8-9524-4c18-9dab-f5c22f473934">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="lehWithDceMerged"><![CDATA[%dw 2.0
+output application/json
+var t = vars.dceStore
+---
+vars.finalEligibilityHistory update {
+    case .dcePayload! -> t
+}]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+						<ee:transform doc:name="completeLeh" doc:id="aba6a6e5-b4ec-465d-8aac-60626ca6564d">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="completeLeh"><![CDATA[%dw 2.0
+output application/json
+---
+vars.completeLeh + vars.lehWithDceMerged]]></ee:set-variable>
+								<ee:set-variable variableName="dceStore" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+						</foreach>
+					<error-handler >
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="31c99d47-d899-4aab-bf8d-64d610d6d71d" type="LEH:UNAVAILABLE">
+							<ee:transform doc:name="payload" doc:id="7c281eba-87a1-494d-9751-27d5d0ee3886" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+								</ee:message>
+							</ee:transform>
+						</on-error-continue>
+						<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="c0538219-1350-4ae3-867e-abadfecbc0d0" type="DCE:UNAVAILABLE,MULE:COMPOSITE_ROUTING">
+							<ee:transform doc:name="merge" doc:id="c1cadb28-75d8-43b1-86e3-0540a13f9a53" >
+								<ee:message />
+								<ee:variables >
+									<ee:set-variable variableName="lehWithDceMerged" ><![CDATA[%dw 2.0
+output application/json
+var t = vars.dceStore
+---
+vars.finalEligibilityHistory update {
+    case .dcePayload! -> t
+}]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+							<ee:transform doc:name="completeLeh" doc:id="c4598358-e885-4914-8915-780d21558984" >
+								<ee:message />
+								<ee:variables >
+									<ee:set-variable variableName="dceStore" ><![CDATA[%dw 2.0
+output application/java
+---
+[]]]></ee:set-variable>
+									<ee:set-variable variableName="completeLeh" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.completeLeh + vars.lehWithDceMerged]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+							<ee:transform doc:name="error sysMsg_dce" doc:id="1d5d3df0-ef81-4978-ac90-469253dadba2" >
+								<ee:message >
+									<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"systemMessage": [
+    {
+      "source": "DCE",
+      "code": "HTTP",
+      "additionalInfo":"Resource Unavailable."
+     }
+  ]]]></ee:set-payload>
+								</ee:message>
+								<ee:variables >
+									<ee:set-variable variableName="sysMsg_dceError" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+      	"source": vars.inputMarker,
+        "code": vars.coreExceptionHandlingResponse.systemMessage[0].code,
+      	additionalInfo: trim(vars.coreExceptionHandlingResponse.systemMessage[0].additionalInfo) default ""
+}]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+						</on-error-continue>
+					</error-handler>
+				</try>
+				<choice doc:name="check sysMsg_dceError" doc:id="be6e48f2-119e-4877-b05b-aea9e4b40988" >
+				<when expression="#[vars.sysMsg_dceError != null]">
+						<ee:transform doc:name="dce error final response" doc:id="026e8e99-46c2-4f57-92a3-c5536c265335" >
+							<ee:message >
+								<ee:set-payload resource="mappings/dceErrorMappingsFinalPayload.dwl" />
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+200]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+					</when>
+				<when expression="#[vars.sysMsg_lehError != null]">
+						<ee:transform doc:name="error payload" doc:id="199665c8-c85b-4f7d-9af1-2f26f76e082a" >
+							<ee:message >
+								<ee:set-payload resource="mappings/logFinalErrorPayload.dwl" />
+							</ee:message>
+							<ee:variables >
+							</ee:variables>
+						</ee:transform>
+						<ee:transform doc:name="update code and httpStatus" doc:id="d5a8dc6a-00ea-4980-ba3a-a307801f2bbe" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+//if(payload.headerArea.systemMessage.code contains "S0001") 404 else 200
+payload update {
+case .headerArea.systemMessage -> 
+payload.headerArea.systemMessage map (item) -> (
+    item update {
+        case .code! if (item.code=="S0001") -> "INV"
+    }
+)}]]></ee:set-payload>
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+if(payload.headerArea.systemMessage.code contains "S0001") 400 else 200]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+					</when>
+					<when expression="#[(vars.sysMsg_dceError) == null]">
+						<ee:transform doc:name="final payload mapping" doc:id="dd982829-8d81-417e-9a6c-1753ba8a421f">
+							<ee:message>
+								<ee:set-payload resource="mappings/finalResponseGeneration.dwl" />
+							</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+vars.coreExceptionHandlingResponse.httpStatus]]></ee:set-variable>
+							</ee:variables>
+						</ee:transform>
+					</when>
+					
+					
+				</choice>
+				<ee:transform doc:name="buildLogMessage" doc:id="9a5053e9-0e40-4c8e-abb6-9d3449338f82">
+
+			<ee:message>
+
+			</ee:message>
+
+			<ee:variables>
+
+				<ee:set-variable variableName="coreLoggingLogPayloadRequest"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	clientId: attributes.headers.client_id,
+	logLevel: "INFO",
+	messageId: vars.messageId  default correlationId,
+	name: app.name,
+	logPoint: "Final Payload",
+	reason: "status: Final Response | flow: ldsMembership_leh_dce_call",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: "SEV4",
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null,
+}]]></ee:set-variable>
+
+			</ee:variables>
+
+		</ee:transform>
+		<flow-ref doc:name="CoreLogging_main" doc:id="a21059d6-9bec-402f-a446-8416fbaa47c3" name="CoreLogging_main" target="CoreLoggingResponse"/>
+
+	
+			
+</when>
+			<otherwise >
+				<ee:transform doc:name="no person info found" doc:id="5092ed30-4d4f-46ab-aa78-62fbc22dea9e" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+      "systemEnvironmentCode":vars.sysEnvCode,
+      "messageId":vars.messageId,
+      "systemMessage":[
+         {
+            "source":"BP_LDSMembershipInfo",
+            "code":"DNF",
+            "additionalInfo": "No Person Info Found in LDS EID=" ++ vars.originalPayload.payloadArea.eid
+         }
+      ]
+   
+}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+404]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>	
+	
+	
+</mule>

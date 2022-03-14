@@ -1,0 +1,11 @@
+{
+  "messageId": "mockErrorResponse",
+  "systemEnviromentCode": "E2E",
+  "systemMessage": [
+    {
+      "source": "BP_GetMembership",
+      "code": "HTTP",
+      "additionalInfo": "Resource Unavailable"
+    }
+  ]
+}

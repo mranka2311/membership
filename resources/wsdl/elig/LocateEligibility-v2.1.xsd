@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:common="urn:common2_0.schema.bcbsm.com"
+	xmlns:mbr="urn:mbr2_1.schema.bcbsm.com"
+	xmlns:meta="urn:meta1_1.schema.bcbsm.com"
+	xmlns:tns="urn:locateelig2_1.elig.schema.bcbsm.com"
+	attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="urn:locateelig2_1.elig.schema.bcbsm.com"
+	version="2.1.2">
+<!--
+	=================== Change Log ===================
+		Version	: 2.1.2
+		Date		: 01/03/2018 
+		Details		: Added InclMessaContracts field to LocateEligibilityHistoryReqPayloadType.
+				
+		Version	: 2.1.1
+		Date		: 01/07/2016 
+		Details		: Added UseCacheInd to LocateEligibilityHistoryReqPayloadType.
+		
+		Version	: 2.1.0
+		Date		: 7/19/2010
+		Details		: Upgraded schemas, Common1.0 to Common2.0, Meta1.0 to Meta1.1, and Mbr1.0 to Mbr2.1
+				    : Removed reference to Bnft namespace as it is not used.
+				    : Upgrade of schemas changed NameType.MiddleInitial to Middle.
+
+				
+		Version	: 2.0.0
+		Date		: ?
+		Details		: Virtual update for Member Portal that was never documented.
+
+		Version	: 1.0.4
+		Date		: 8/31/2009
+		Details		: Added new element SubscriberMismatch.
+
+		Version	: 1.0.3
+		Date		: 7/13/2009
+		Details		: Added optional element for GenderIndicator and RelationshipCode to LEHMemberType
+
+		Version	: 1.0.2
+		Date		: 4/24/2009
+		Details		: Added optional element for Contract to EligibilityHistory
+				Response Payload made optional for error reporting.
+
+		Version	: 1.0.1
+		Date		: 9/11/2008
+		Details		: Adjusted namespaces for new standards
+
+		Version	: 1.0
+		Date		: 4/25/2008
+		Details		: Initial version.
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+	<import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="../mbr/MbrTypes-v2.1.xsd"/>
+
+	<element name="LocateEligHistRequest">
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType">
+					<sequence>
+						<element name="Payload" type="tns:LocateEligibilityHistoryReqPayloadType"/>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="LocateEligHistResponse">
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element minOccurs="0" name="Payload" type="tns:LocateEligibilityHistoryRespPayloadType"/>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<complexType name="LocateEligibilityHistoryReqPayloadType">
+		<sequence>
+			<element name="Contract" type="mbr:ContractNumberType">
+				<annotation>
+					<documentation>Requires only contract number.  Extent and AlphaPrefix are optional.</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="BusinessChannel" type="common:BusinessChannelType">
+				<annotation>
+					<documentation>This will allow the consumers to call one business channel only.  Acceptable values BCN, LOCAL, NASCO </documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="Group" type="mbr:GroupIdentifier">
+				<annotation>
+					<documentation>Requires both Number and Suffix if this criteria is used.</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="Member" type="tns:LEHMemberCriteriaType">
+				<annotation>
+					<documentation>
+						Either [FirstName and DateOfBirth] or [SequenceNumber] must be provided if this criteria is used.
+					</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="EligibilityPeriod" type="common:DateRangeType">
+				<annotation>
+					<documentation>
+						Date range to check for eligibility within its boundaries.  Only Start is required if this criteria is used.
+						If the End element is not specified then it will default to the start date.
+						If the Period is not presented then both Start and End default to system date.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="UseCacheInd" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Indicates whether the service response data is  sourced from the cache or freshly from the back end systems</documentation>
+				</annotation>
+			</element>
+			<element name="InclMessaContracts" type="common:YesNoIndicatorEnum" default="N" minOccurs="0">
+				<annotation>
+					<documentation>If 'Y' then MESSA contracts normally excluded will now be included.  Value and behavior default to 'N'.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="LEHMemberCriteriaType">
+		<sequence>
+			<element minOccurs="0" name="SequenceNumber" type="mbr:MemberSequenceIdentifier"/>
+			<element minOccurs="0" name="Name" type="common:NameType"/>
+			<element minOccurs="0" name="DateOfBirth" type="common:SegmentedDateType"/>
+		</sequence>
+	</complexType>
+	<complexType name="LEHMemberType">
+		<complexContent>
+			<extension base="tns:LEHMemberCriteriaType">
+				<sequence>
+					<element minOccurs="0" name="GenderIndicator">
+						<simpleType>
+							<restriction base="string">
+								<pattern value="[MFU]"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element minOccurs="0" name="RelationshipCode" type="string"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="LocateEligibilityHistoryRespPayloadType">
+		<sequence>
+			<element name="ContractExistIndicator" type="string">
+				<annotation>
+					<documentation>Indicates if the contract was found</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="ContractActiveIndicator" type="string">
+				<annotation>
+					<documentation>For existing contracts will be set Y if the contract was enforced for any date that falls in the given date range of the request</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="MemberFoundIndicator" type="string">
+				<annotation>
+					<documentation>
+						Used only for member eligibility requests, will be set to a numeric weight based on how well the member matches the given criteria.
+					</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="MemberActiveIndicator" type="string">
+				<annotation>
+					<documentation>
+						Used only for member eligibility requests, If the member was found then this will be set to Y if the contract was enforced for the member for any date that falls in the given range of the request
+					</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="MultipleMembersFoundIndicator" type="string">
+				<annotation>
+					<documentation>
+						Used only for member eligibility requests, If the member was found then this will be set to Y if it becomes impossible to resolve a single member by the described cirteria.
+					</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="SubscriberMismatch" type="common:YesNoIndicatorEnum">
+				<annotation>
+					<documentation>
+						Indicates there was multiple subscribers for same contract number issue in backend. This warns the consuming application that there is a possible PHI issue for other processes that do not filter by member information as well.
+					</documentation>
+				</annotation>
+			</element>
+			<element maxOccurs="unbounded" minOccurs="0" name="EligibilityHistory" type="tns:EligibilityHistoryType">
+				<annotation>
+					<documentation>This is a repeating unit that represents a specific contract-group eligibility period and may contain specific member information as well.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="EligibilityHistoryType">
+		<complexContent>
+			<extension base="common:ExpirableType">
+				<sequence>
+					<element name="Group" type="mbr:GroupIdentifier">
+						<annotation>
+							<documentation>
+								For all systems other than FEP, this identifies the group the period encompasses - Number and Suffix.
+								For FEP it more symbolizes the group product type by a code than an actual group Number (Suffix will be empty).  Values for FEP follow:
+									104 - Standard Option - Single
+									105 - Standard Option - Family
+									111 - Basic Option - Single
+									112 - Basic Option - Family
+							</documentation>
+						</annotation>
+					</element>
+					<element minOccurs="0" name="SubscriberName" type="common:NameType"/>
+					<element minOccurs="0" name="Member" type="tns:LEHMemberType">
+						<annotation>
+							<documentation>
+								[FirstName and DateOfBirth] will be provided if this criteria is to be returned.
+							</documentation>
+						</annotation>
+					</element>
+					<element minOccurs="0" name="MemberMatchRating" type="string">
+						<annotation>
+							<documentation>
+								Numeric weight based on how well the member matches with this set of group info and eligibility dates.
+							</documentation>
+						</annotation>
+					</element>
+					<element name="Source" type="common:BusinessChannelType">
+						<annotation>
+							<documentation>
+								Possible values: BCN, NASCO, LOCAL, MA, FEP
+							</documentation>
+						</annotation>
+					</element>
+					<element minOccurs="0" name="Contract" type="mbr:ContractNumberType"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

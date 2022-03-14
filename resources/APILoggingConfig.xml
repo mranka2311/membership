@@ -1,0 +1,12 @@
+<logging>
+	<entry logLevel="ERROR" logPoint="*" category="*" sync="false">
+		<sink name="splunk" />
+	<!-- optional email sink to be added based upon use case -->
+	</entry>
+	<entry logLevel="*" logPoint="*" category="exception" sync="false">
+		<sink name="splunk" />
+	</entry>
+		<entry logLevel="WARN" logPoint="ConsumerUsage" category="standard" sync="false">
+		<sink name="splunk" />
+	</entry>
+</logging>

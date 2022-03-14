@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:meta2_0.schema.bcbsm.com" xmlns:tns="urn:meta2_0.schema.bcbsm.com" xmlns:common="urn:common3_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.0">
+	<!--
+	=================== Change Log ===================
+		Version	: 2.0.0
+		Date		: 9/24/2014
+		Details		: Added MaxRowsPerPage element to ReqPaginationType
+				Added CanonicalExtType
+				Changed common from 2.0 to 3.0
+				Removed restrictions on Consumer elements
+				Added Context to HeaderAreaType
+
+		Version	: 1.1.1
+		Date		: 9/11/2008
+		Details		: Modified namespace to include schema version..
+				Changed common from 1.0 to 2.0
+
+		Version	: 1.1
+		Date		: 8/14/2008
+		Details		:
+				Added more environments to SystemEnvironmentCode to manage more TERI back-ends.
+					All XML generated on previous type will still work with this type.
+
+		Version	: 1.0
+		Date		: 4/25/2008
+		Details		: Initial version.
+-->
+	<import namespace="urn:common3_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v3.0.xsd"/>
+	<complexType name="CanonicalExtType">
+		<annotation>
+			<documentation>Contains any XML representation of a data structure from a source system which has information not contained in the derived canonical model</documentation>
+		</annotation>
+		<sequence>
+			<any maxOccurs="unbounded"/>
+		</sequence>
+		<attribute name="id" type="string" use="required"/>
+	</complexType>
+	<complexType name="ConsumerType">
+		<annotation>
+			<documentation>Identifies the End consumer of message.</documentation>
+		</annotation>
+		<sequence>
+			<element name="ID" type="string">
+				<annotation>
+					<documentation>Unique id that is used to identify the consuming application. The id will be assigned to the consumer by the Services COE and used as specified by the Service Consumer Guide. This should be the end consumer ID, i.e the actual consuming appliation that requested the information</documentation>
+				</annotation>
+			</element>
+			<element name="Name" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Additional information about the consuming application (i.e. name of the application). This should be the end consumer name, i.e the actual consuming appliation that requested the information</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="HeaderAreaType" abstract="true">
+		<sequence>
+			<element name="VersionInfo" type="tns:VersionType"/>
+			<element name="CreationDateTime" type="dateTime">
+				<annotation>
+					<documentation>is the date time stamp that the given instance of the Business Object Document was created.  This date must not be modified during the life of the message.</documentation>
+				</annotation>
+			</element>
+			<element name="MessageID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+The MessageId provides a place to carry a Globally Unique Identifier (GUID) that will make each Schema instance uniquely identifiable.  
+This is a critical success factor to enable software developers to use the Globally Unique Identifier (GUID) to build the following services or capabilities:
+1. Legally binding transactions,
+2. Transaction logging,
+3. Exception handling,
+4. Re-sending,
+5. Reporting,
+6. Confirmations,
+7. Security.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="Context" type="tns:CanonicalExtType" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>
+This element will provide for chaining and reporting of environmental contexts in which the transaction is being executed.  It is variable to allow for
+changes to be introduced as the context becomes more or less complicated.  Usages of this element would be to define end user concepts which may contribute
+to privacy, processing, or business rule concepts.
+					</documentation>
+				</annotation>
+			</element>
+		</sequence>
+		<attribute name="systemEnvironmentCode" type="tns:SystemEnvironmentEnum" use="optional"/>
+	</complexType>
+	<complexType name="MessageType">
+		<annotation>
+			<documentation>Informational element that is used to provide an indication toward the effectiveness of the request processing.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="common:CodeDescriptionType">
+				<sequence>
+					<element name="Source" type="string">
+						<annotation>
+							<documentation>Name of the back-end system, which is the source of information</documentation>
+						</annotation>
+					</element>
+					<element name="SubCode" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Code from any other system </documentation>
+						</annotation>
+					</element>
+					<element name="AdditionalInfo" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Additional technical information.  This field should be used instead of appending information to the general Description associated with the Code.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ReqHeaderAreaType">
+		<complexContent>
+			<extension base="tns:HeaderAreaType">
+				<sequence>
+					<element name="Consumer" type="tns:ConsumerType">
+						<annotation>
+							<documentation>Identifies characteristics and control identifiers that relate to the application that created the message.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ReqMessageTemplateType" abstract="true">
+		<annotation>
+			<documentation>Is the schema based inheritance for all service schemas. The logical model would also include the Payload.</documentation>
+		</annotation>
+		<sequence>
+			<element name="ReqHeaderArea" type="tns:ReqHeaderAreaType">
+				<annotation>
+					<documentation>Provides the information that an application may need to know in order to communicate in an integration of two or more business applications. The HeaderArea is used at the applications layer of communication. While the integration frameworks web services and middleware provide the communication layer that message operates on top of.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ReqPaginationType">
+		<annotation>
+			<documentation> This is used for large messages where response is broken down into multiple responces.</documentation>
+		</annotation>
+		<sequence>
+			<element name="PageID" type="string" minOccurs="0"/>
+			<element name="NeedPagination" type="common:YesNoIndicatorType" default="N" minOccurs="0"/>
+			<element name="MaxRowsPerPage" type="integer" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="RespHeaderAreaType">
+		<complexContent>
+			<extension base="tns:HeaderAreaType">
+				<sequence>
+					<element name="Status" type="tns:RespStatusEnum"/>
+					<element name="SystemMessage" type="tns:MessageType" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>Used to communicate results of component systems that are consumed by the request's processing.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="RespMessageTemplateType" abstract="true">
+		<annotation>
+			<documentation>Is the schema based inheritance for all service schemas. The logical model would also include the Payload.</documentation>
+		</annotation>
+		<sequence>
+			<element name="RespHeaderArea" type="tns:RespHeaderAreaType">
+				<annotation>
+					<documentation>Provides the information that an application may need to know in order to communicate in an integration of two or more business applications. The HeaderArea is used at the applications layer of communication. While the integration frameworks web services and middleware provide the communication layer that message operates on top of.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="RespPaginationType">
+		<annotation>
+			<documentation> This is used for long messages where response is broken down into multiple responces.</documentation>
+		</annotation>
+		<sequence>
+			<element name="PageID" type="string" minOccurs="0"/>
+			<element name="RowsReturned" type="nonNegativeInteger">
+				<annotation>
+					<documentation>Number of contracts returned in the response</documentation>
+				</annotation>
+			</element>
+			<element name="MaxRowsPerPage" type="nonNegativeInteger" minOccurs="0">
+				<annotation>
+					<documentation>Maximum number of rows that can be returned in one response/page. </documentation>
+				</annotation>
+			</element>
+			<element name="MoreDataAvailable" type="common:YesNoIndicatorType"/>
+		</sequence>
+	</complexType>
+	<simpleType name="RespStatusEnum">
+		<annotation>
+			<documentation>Indicates the overall status of the service response to the consumer (possible statuses include successful, partial data, failure, etc).</documentation>
+		</annotation>
+		<restriction base="normalizedString">
+			<enumeration value="SUCCESSFUL"/>
+			<enumeration value="UNSUCCESSFUL"/>
+			<enumeration value="PARTIAL"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="SystemEnvironmentEnum">
+		<annotation>
+			<documentation>
+				Indicates the environment in which to run the operation through.
+				This has multiple values to cover current and future TERI runways.
+				Promotions normally move from TEST to SIT to QA/E2E to PROD. 
+			</documentation>
+		</annotation>
+		<restriction base="normalizedString">
+			<enumeration value="PROD"/>
+			<enumeration value="QA"/>
+			<enumeration value="E2E"/>
+			<enumeration value="E2E2"/>
+			<enumeration value="E2E3"/>
+			<enumeration value="E2E4"/>
+			<enumeration value="E2E5"/>
+			<enumeration value="E2E6"/>
+			<enumeration value="E2E7"/>
+			<enumeration value="E2E8"/>
+			<enumeration value="E2E9"/>
+			<enumeration value="E2E10"/>
+			<enumeration value="SIT"/>
+			<enumeration value="SIT2"/>
+			<enumeration value="SIT3"/>
+			<enumeration value="SIT4"/>
+			<enumeration value="SIT5"/>
+			<enumeration value="SIT6"/>
+			<enumeration value="SIT7"/>
+			<enumeration value="SIT8"/>
+			<enumeration value="SIT9"/>
+			<enumeration value="SIT10"/>
+			<enumeration value="TEST"/>
+			<enumeration value="TEST2"/>
+			<enumeration value="TEST3"/>
+			<enumeration value="TEST4"/>
+			<enumeration value="TEST5"/>
+			<enumeration value="TEST6"/>
+			<enumeration value="TEST7"/>
+			<enumeration value="TEST8"/>
+			<enumeration value="TEST9"/>
+			<enumeration value="TEST10"/>
+		</restriction>
+	</simpleType>
+	<complexType name="VersionType">
+		<sequence>
+			<element name="ServiceVersion" type="string">
+				<annotation>
+					<documentation>Indicates the service version.</documentation>
+				</annotation>
+			</element>
+			<element name="SchemaVersion" type="string">
+				<annotation>
+					<documentation>Indicates the schema version.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+</schema>

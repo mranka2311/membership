@@ -1,0 +1,87 @@
+<resourceMessages>
+	
+	<entry>
+		<key marker="APIDefaultMarker" code="APIKIT:BAD_REQUEST" />
+		<value httpCode="400" code="INV"  />
+	</entry>
+	
+	<entry>
+		<key marker="APIDefaultMarker" code="APIKIT:NOT_FOUND" />
+		<value httpCode="501" code="MSFLOW" subCode="APIKIT:NOT_FOUND" additionalInfo="Resource not implemented." />
+	</entry>
+	<entry>
+		<key marker="APIDefaultMarker" code="APIKIT:RETRY_EXHAUSTED" />
+		<value httpCode="500" code="DB" subCode="APIKIT:RETRY_EXHAUSTED" depCode="" />
+	</entry>
+	<entry>
+		<key marker="APIDefaultMarker" code="DB:CONNECTIVITY" />
+		<value httpCode="503" code="DB" subCode="-1"  />
+	</entry>
+	
+	<entry>
+		<key marker="APIDefaultMarker" code="EXPRESSION" />
+		<value httpCode="500" code="DB" subCode="-1"  />
+	</entry>
+	
+	<entry>
+		<key marker="APIDefaultMarker" code="ANY" />
+		<value httpCode="500" code="MSFLOW" subCode="-1"  />
+	</entry>
+	
+	<entry>
+		<key marker="APIDefaultMarker" code="STREAM_MAXIMUM_SIZE_EXCEEDED" />
+		<value httpCode="500" code="DB" subCode="-1"  />
+	</entry>
+	<entry>
+		<key marker="APIDefaultMarker" code="APIKIT:RETRY_EXHAUSTED" />
+		<value httpCode="500" code="DB" subCode="APIKIT:RETRY_EXHAUSTED" depCode="" />
+	</entry>	
+	<entry>
+		<key marker="APIDefaultMarker" code="EXPRESSION" />
+		<value httpCode="500" code="DB" subCode="-1"  />
+	</entry>
+	
+	
+	<entry>
+		<key marker="bpgetmembership" code="200" />
+		<value httpCode="200" code="SUC" additionalInfo="Successful Completion." />
+	</entry>
+	
+	<entry>
+		<key marker="bpgetmembership" code="400" />
+		<value httpCode="400" code="INV" additionalInfo="Input Validation Failed" />
+	</entry>
+	
+	<entry>
+		<key marker="bpgetmembership" code="404" />
+		<value httpCode="404" code="DNF" additionalInfo="Data Not Found" />
+	</entry>
+	
+	<entry>
+		<key marker="bpgetmembership" code="500" />
+		<value httpCode="500" code="-1" additionalInfo="Unexpected Exception" />
+	</entry>
+	
+	<entry>
+		<key marker="bpgetmembership" code="503" />
+		<value httpCode="503" code="HTTP" additionalInfo="Resource Unavailable" />
+	</entry>
+	<entry>
+		<key marker="LEH" code="503" />
+		<value httpCode="503" code="HTTP" additionalInfo="Resource Unavailable" />
+	</entry>
+	<entry>
+		<key marker="DCE" code="503" />
+		<value httpCode="503" code="HTTP" additionalInfo="Resource Unavailable" />
+	</entry>
+	<entry>
+		<key marker="bpldsmembershipinfo" code="404" />
+		<value httpCode="404" code="DNF" additionalInfo="No Data found from silds api" />
+	</entry>
+	<entry>
+		<key marker="bpldsmembershipinfo" code="503" />
+		<value httpCode="503" code="HTTP" additionalInfo="Resource Unavailable." />
+	</entry>
+	
+
+</resourceMessages>

@@ -1,0 +1,11 @@
+{
+  "messageId": "mockErrorResponse",
+  "systemEnviromentCode": "E2E",
+  "systemMessage": [
+    {
+      "source": "BP_GetMembership",
+      "code": "DNF",
+      "additionalInfo": "No data returned from backend"
+    }
+  ]
+}

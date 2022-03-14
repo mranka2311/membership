@@ -1,0 +1,61 @@
+#%RAML 1.0
+title: BP_GetMembership
+
+
+description: API sends Membership Response using an input EID.
+version: v1.0
+
+uses:
+  standardTypes: /exchange_modules/ada6332a-6827-4192-a43d-cf7babc8f2f4/metatypeslibrary/1.0.0/metaTypesLibrary.raml
+  traitsTypes: exchange_modules/ada6332a-6827-4192-a43d-cf7babc8f2f4/traitslibrary/1.0.0/traitsLibrary.raml
+
+mediaType: application/json
+protocols: [HTTPS]
+
+/retrieve:
+  post:
+    is:  [traitsTypes.client-id-required]
+    description: API sends Deter Eligibility Response using an EID.
+
+    body:
+      application/json:
+        type: !include /types/getMembershipRequest.raml
+        example: !include /examples/getMembershipRequest.json
+
+    responses:
+      200:
+        body:
+          application/json:
+            type: !include /types/getMembershipResponse.raml
+            example: !include /examples/getMembershipResponse.json
+
+      400:
+        body:
+          application/json:
+            type: standardTypes.errorResponseType
+            example: !include /examples/invalidInputErrorResponse.json
+
+      404:
+        body:
+          application/json:
+            type: standardTypes.errorResponseType
+            example: !include /examples/noDataFoundErrorResponse.json
+
+      500:
+        body:
+          application/json:
+            type: standardTypes.errorResponseType
+            example: !include /examples/unexpectedExceptionErrorResponse.json
+
+      501:
+        body: 
+          application/json:
+            type: standardTypes.errorResponseType
+            example: !include /examples/resourceUnavailableErrorResponse.json
+
+
+      503:
+        body: 
+          application/json:
+            type: standardTypes.errorResponseType
+            example: !include /examples/resourceUnavailableErrorResponse.json

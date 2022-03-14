@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2018 sp1 (http://www.altova.com) by Altova XMLSpy 2018 Professional XML Editor, Installed for 104 users (Blue Cross Blue Shield of MI) -->
+<schema xmlns:grp="urn:group1_0.mbr.schema.bcbsm.com" xmlns:grpbnftpkg="urn:grpbenfitpkg1_0.mbr.schema.bcbsm.com" xmlns:meta="urn:meta1_1.schema.bcbsm.com" xmlns:mbr="urn:mbr2_1.schema.bcbsm.com" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:grpbenfitpkg1_0.mbr.schema.bcbsm.com" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0.0">
+	<!--
+	=================== Change Log ===================
+
+		Version		: 1.0.0
+		Date		: 09/17/2018
+		Details		: Added new operation RtrvGrpBenefitPkg and corresponding Request and Response Payload elements.
+	
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+	<import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="MbrTypes-v2.1.xsd"/>
+	<element name="RtrvGrpBenefitPkgRequest">
+		<annotation>
+			<documentation>Request for RtrvGrpBenefitPkg</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="grpbnftpkg:RtrvGrpBenefitPkgReqPayloadType">
+							<annotation>
+								<documentation>Payload for Retrieve Group Benefit Request.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="RtrvGrpBenefitPkgResponse">
+		<annotation>
+			<documentation>Response for RtrvGrpBenefitPkgs</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="grpbnftpkg:RtrvGrpBenefitPkgRespPayloadType" minOccurs="0">
+							<annotation>
+								<documentation>Payload for Retrieve Group Benefits(BPIDS) Response.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<complexType name="RtrvGrpBenefitPkgReqPayloadType">
+		<annotation>
+			<documentation>List of groups with BPID list rolled up by Company.</documentation>
+		</annotation>
+		<sequence>
+			<element name="CompanyID" type="string">
+				<annotation>
+					<documentation>Company ID</documentation>
+				</annotation>
+			</element>
+			<element name="EffectiveDate" type="date"/>
+		</sequence>
+	</complexType>
+	<complexType name="RtrvGrpBenefitPkgRespPayloadType">
+		<annotation>
+			<documentation>List of BPIDs ( Regular/complementary)  Associated with the requested Group Number.</documentation>
+		</annotation>
+		<sequence>
+			<element name="GrpBenefitInfo" type="grpbnftpkg:GrpBenefitInfoType" minOccurs="0" maxOccurs="250"/>
+		</sequence>
+	</complexType>
+	<complexType name="GrpBenefitInfoType">
+		<sequence>
+			<element name="Group" type="mbr:GroupIdentifier">
+				<annotation>
+					<documentation> Group Number and Suffix </documentation>
+				</annotation>
+			</element>
+			<element name="Name" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Group Name</documentation>
+				</annotation>
+			</element>
+			<element name="PackageCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Package Code  for Auto National groups</documentation>
+				</annotation>
+			</element>
+			<element name="DateRange" type="common:DateRangeType" minOccurs="0"/>
+			<element name="BPIDInfo" type="grpbnftpkg:BPIDInfoType" minOccurs="0" maxOccurs="5">
+				<annotation>
+					<documentation>Information about BPID ID</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="BPIDInfoType">
+		<complexContent>
+			<extension base="common:CodeDescriptionType">
+				<sequence>
+					<element name="LOB" type="common:CodeDescriptionType" maxOccurs="5">
+						<annotation>
+							<documentation>Indicates Line of Business for CSR phone number possible values are "D" for Dental, "M" Medical, "V" Vision, "X" Pharmacy</documentation>
+						</annotation>
+					</element>
+					<element name="PackageType" type="string"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

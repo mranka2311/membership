@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:elig2_3.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns:bnft="urn:bnft2_0.schema.bcbsm.com" xmlns:mbr="urn:mbr2_1.schema.bcbsm.com" xmlns:meta="urn:meta1_1.schema.bcbsm.com" xmlns:tns="urn:elig2_3.schema.bcbsm.com" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.3.0">
+	<!--
+	=================== Change Log ===================
+		Version		: 2.3.0
+		Date		: 06/09/2014
+		Details		: Added Name, Address, Phone to ProductGroupCommentType.
+					  Added ProtectedHealthcareInfoInd to ProductGroupCommentType as string.
+					  Added common:ExpirableType to ProductGroupCommentType.
+	
+		Version		: 2.2.0
+		Date		: 06/23/2014
+		Details		: Added CustodialParent, AlternateInfo, AuthorizedRep and PersonalRep to MemberEligibilityInfoType.
+
+		Version		: 2.1.0
+		Date		: 2/5/2014
+		Details		: Minor versioned the schema to address known issues that were introduced in the creation of 2.0.4.		
+								
+		Version		: 2.0.4
+		Date		: 11/09/2012  (12/22/2012 - updated)
+		Details		: Added New elements to the MemberDemographics - MemberBenefitLevel, MembersTier.
+				Added new elements ProductEffectiveDate, EnrollmentCode, PreExistingWaitingPeriodDate and BenefitWaitingPeriodDate
+				to the LOBActiveDatesType.		
+								
+		Version		: 2.0.3
+		Date		: 09/13/2010
+		Details		: Added new attributes to LOBIndicatorType - productClass and productDescription.
+		
+		Version		: 2.0.2
+		Date		: 10/12/2010
+		Details		: Added field SecondaryGroupNumber to LOBActiveDatesType to support DCE 1.1 backward transformations.
+
+		Version		: 2.0.1
+		Date		: 7/28/2010
+		Details		: Moved MemberMedicareIndicator into a type: MemberMedicareIndicatorType
+				Moved LOBIndicator into a type: LOBIndicatorType
+
+		Version		: 2.0.0
+		Date		: 2/2/2009
+		Details		: Made MemberRosterInfoType extend mbr:MemberContactType instead of instantiating a subelement for it
+				ActiveDatesType.PaidToDate changed to a date type
+				ActiveDatesType.MemberGraceCode changes to GraceCode.
+				Changed name of ProductGroupComment to ProductGroupCommentType
+				Change MemberEligibilityInfoType.Qualifiers to Qualifier
+				Change MemberEligibilityInfoType.Comments to Comment
+				Added QualifierType.
+				Added FacAdmissionVerif, ProfAdmissionVerif, and EmployeeStatus elements to MemberEligibilityInfoType
+				Added MemberMatchRating to MemberRosterInfoType
+				Added ITSBenefitKey to LOBActiveDatesType to support ITSData functionality
+
+		Version		: 1.1.0
+		Date		: 12/11/2008
+		Details		: For LOBIndicator element, added systemCode as attribute
+
+		Version		: 1.0.1
+		Date		: 9/11/2008
+		Details		: Adjusted namespaces for new standards
+
+		Version		: 1.0.0
+		Date		: 4/25/2008
+		Details		: Initial version.
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:bnft2_0.schema.bcbsm.com" schemaLocation="../bnft/BnftTypes-v2.0.xsd"/>
+	<import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="../mbr/MbrTypes-v2.1.xsd"/>
+	<complexType name="ActiveDatesType">
+		<complexContent>
+			<extension base="common:ExpirableType">
+				<sequence>
+					<element name="EffectiveCode" type="string" minOccurs="0"/>
+					<element name="PaidToDate" type="date" minOccurs="0"/>
+					<element name="GraceCode" type="string" minOccurs="0"/>
+					<element name="GracePeriod" type="string" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AlternateInfoType">
+		<complexContent>
+			<extension base="common:ExpirableType">
+				<sequence>
+					<element name="Name" type="common:NameType" minOccurs="0"/>
+					<element name="Address" type="common:AddressType" minOccurs="0"/>
+					<element name="Phone" type="common:PhoneNumberDetailedType" minOccurs="0"/>
+					<element name="ProtectedHealthcareInfoInd" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Any member on the contract has ever put Individual Rights into effect for Protected Healthcare Information regarding their care</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="CustodialParentType">
+		<complexContent>
+			<extension base="common:ExpirableType">
+				<sequence>
+					<element name="Name" type="common:NameType" minOccurs="0"/>
+					<element name="Address" type="common:AddressType" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="LOBActiveDatesType">
+		<complexContent>
+			<extension base="tns:ActiveDatesType">
+				<sequence>
+					<element name="ProductEffectiveDate" type="string" minOccurs="0">
+						<annotation>
+							<documentation>The effective date for the benefits on the contract
+							 				Format "YYYY-MM-DD".
+							</documentation>
+						</annotation>
+					</element>
+					<element name="EnrollmentCode" type="string" minOccurs="0">
+						<annotation>
+							<documentation>The Enrollment Code defines the contract options. Char 3. 
+							</documentation>
+						</annotation>
+					</element>
+					<element name="PreExistingWaitingPeriodDate" type="string" minOccurs="0">
+						<annotation>
+							<documentation>The date on which the PreExisting waiting periods expires. Applies to all benefits on a contract for an individual.
+											Format "YYYY-MM-DD".
+							</documentation>
+						</annotation>
+					</element>
+					<element name="BenefitWaitingPeriodDate" type="string" minOccurs="0">
+						<annotation>
+							<documentation>The date on which the waiting period expires. Applies to specific benefits.
+											Format "YYYY-MM-DD".
+							</documentation>
+						</annotation>
+					</element>
+					<element name="LOBIndicator" type="tns:LOBIndicatorType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="ITSBenefitKey" type="bnft:BenefitKeyType" minOccurs="0"/>
+					<element name="SecondaryGroupNumber" type="string" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<simpleType name="LOBCodeEnum">
+		<annotation>
+			<documentation>Code mapped to BCBSM LOBs as follows:
+D = Dental
+F = Facility
+P = Professional
+M = Medical (F + P)
+H = Hearing
+V = Vision
+X = Pharmacy
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="D"/>
+			<enumeration value="F"/>
+			<enumeration value="P"/>
+			<enumeration value="M"/>
+			<enumeration value="H"/>
+			<enumeration value="V"/>
+			<enumeration value="X"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="LOBEnum">
+		<annotation>
+			<documentation>Full descriptions of Lines of Business</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="DENTAL"/>
+			<enumeration value="FACILITY"/>
+			<enumeration value="PROFESSIONAL"/>
+			<enumeration value="MEDICAL"/>
+			<enumeration value="HEARING"/>
+			<enumeration value="VISION"/>
+			<enumeration value="PHARMACY"/>
+		</restriction>
+	</simpleType>
+	<complexType name="LOBIndicatorType">
+		<simpleContent>
+			<extension base="tns:LOBCodeEnum">
+				<attribute name="systemCode" type="string" use="optional"/>
+				<attribute name="productClass" type="string" use="optional"/>
+				<attribute name="productDescription" type="string" use="optional"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="MemberEligibilityInfoType">
+		<complexContent>
+			<extension base="tns:MemberRosterInfoType">
+				<sequence>
+					<element name="MemberActiveDates" type="tns:LOBActiveDatesType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="MemberMedicareIndicator" type="tns:MemberMedicareIndicatorType" minOccurs="0"/>
+					<element name="MedicareHIBNumber" type="string" minOccurs="0">
+						<annotation>
+							<documentation>SSN + Health Insurance Benefits (HIB) Number.</documentation>
+						</annotation>
+					</element>
+					<element name="MAContractIndicator" type="common:BooleanIndicatorEnum" minOccurs="0"/>
+					<element name="CDHIndicator" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Consumer Driven Health Care indicator. Values indicate who pays for the care and include:
+													 - Blank???
+													B- Blue Health Care Bank (BHB)
+													H- HSA for other than BHB
+													I- Integrated Cost Share NonCDH
+													N- No CDH
+													P- Personal Care Account
+													X- Not used in eligibility (On claim, indicates claim was excluded from PCA processing)
+													Y- HRA or FSA for other than BSB accounts
+													Z- Not used in eligibility (On claim, indicates a zero balance in PCA account or no dollars applied to the claim - no ded/coinsurance)
+													R- HRA only
+							</documentation>
+						</annotation>
+					</element>
+					<element name="FacAdmissionVerif" type="common:YesNoIndicatorEnum" minOccurs="0">
+						<annotation>
+							<documentation>Y/N Indicator of whether verification should occur upon admission (LOCAL only).</documentation>
+						</annotation>
+					</element>
+					<element name="ProfAdmissionVerif" type="common:YesNoIndicatorEnum" minOccurs="0">
+						<annotation>
+							<documentation>Y/N Indicator of whether verification should occur upon admission (LOCAL only).</documentation>
+						</annotation>
+					</element>
+					<element name="Qualifier" type="tns:QualifierType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="Comment" type="tns:ProductGroupCommentType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="EmployeeStatus" type="string" minOccurs="0">
+						<annotation>
+							<documentation>For NASCO use only. Indicator is mapped to description which corresponds to the Subscriber's employment status.</documentation>
+						</annotation>
+					</element>
+					<element name="CustodialParent" type="tns:CustodialParentType" minOccurs="0"/>
+					<element name="AlternateInfo" type="tns:AlternateInfoType" minOccurs="0"/>
+					<element name="AuthorizedRep" type="tns:MbrRepDesignationType" minOccurs="0">
+						<annotation>
+							<documentation>This member has been designated as an authorized representative.</documentation>
+						</annotation>
+					</element>
+					<element name="PersonalRep" type="tns:MbrRepDesignationType" minOccurs="0">
+						<annotation>
+							<documentation>This member on the contract has ever designated a personal representative (ex: power of attorney).</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="MemberMedicareIndicatorType">
+		<sequence>
+			<element name="MedicareAIndicator" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+			<element name="MedicareAExpirable" type="common:ExpirableType" minOccurs="0"/>
+			<element name="MedicareBIndicator" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+			<element name="MedicareBExpirable" type="common:ExpirableType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="MbrRepDesignationType">
+		<complexContent>
+			<extension base="common:ExpirableType">
+				<sequence>
+					<element name="Designation" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Short description of representative information.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="MemberRosterInfoType">
+		<complexContent>
+			<extension base="mbr:MemberContactType">
+				<sequence>
+					<element name="MemberStatus" type="string" minOccurs="0"/>
+					<element name="MemberPrivacyIndicator" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+					<element name="MemberMatchRating" type="string" minOccurs="0">
+						<annotation>
+							<documentation>When member input criteria is provided, this field should provide a member match rating from 00 to 99 indicating how well the member returned matches the input criteria.</documentation>
+						</annotation>
+					</element>
+					<element name="MemberBenefitLevel" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Member's selected Benefit Level designation (returned from Member Store) </documentation>
+						</annotation>
+					</element>
+					<element name="MembersTier" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Member's Selected Tier</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ProductGroupCommentType">
+		<complexContent>
+			<extension base="common:ExpirableType">
+				<sequence>
+					<element name="CommentType" type="string"/>
+					<element name="Description" type="string"/>
+					<element name="Name" type="common:NameType" minOccurs="0"/>
+					<element name="Address" type="common:AddressType" minOccurs="0"/>
+					<element name="Phone" type="common:PhoneNumberDetailedType" minOccurs="0"/>
+					<element name="ProtectedHealthcareInfoInd" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Any member on the contract has ever put Individual Rights into effect for Protected Healthcare Information regarding their care</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="QualifierType">
+		<complexContent>
+			<extension base="common:ExpirableType">
+				<sequence>
+					<element name="Code" type="string"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

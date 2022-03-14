@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns:tns="urn:bnft2_0.schema.bcbsm.com" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:bnft2_0.schema.bcbsm.com" version="2.0.0">
+<!--
+	=================== Change Log ===================
+		Version	: 2.0.0
+		Date		: 9/11/2008
+		Details		: BenefitCrossIdentifier change to simpleType.
+				BenefitShieldIdentifier change to simpleType.
+				Added BenefitKeyType
+				Modifed common schema to version 2.0
+
+		Version	: 1.0.1
+		Date		: 9/11/2008
+		Details		: Modifed namespaces to include version information.
+
+		Version	: 1.0.0
+		Date		: 4/25/2008
+		Details		: Initial version
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+
+	<simpleType name="BenefitCrossIdentifier">
+		<restriction base="string">
+			<length value="4"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="BenefitShieldIdentifier">
+		<restriction base="string">
+			<length value="4"/>
+		</restriction>
+	</simpleType>
+	<complexType name="BenefitKeyType">
+		<sequence>
+			<element minOccurs="0" name="CommonKey" type="string"/>
+			<element minOccurs="0" name="CrossKey" type="tns:BenefitCrossIdentifier"/>
+			<element minOccurs="0" name="ShieldKey" type="tns:BenefitShieldIdentifier"/>
+			<element minOccurs="0" name="BenefitString" type="tns:BenefitStringIdentifier"/>
+			<element minOccurs="0" name="BenefitPackageIdentifier" type="tns:BenefitPackageIdentifier"/>
+		</sequence>
+	</complexType>
+	<simpleType name="BenefitPackageIdentifier">
+		<annotation>
+			<documentation>Benefit Package Identifier. </documentation>
+		</annotation>
+		<restriction base="string">
+			<length value="5"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="BenefitStringIdentifier">
+		<restriction base="string">
+			<length value="5"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="CoverageScopeEnum">
+		<annotation>
+			<documentation>INV = Individual or FAM = Family</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="INV"/>
+			<enumeration value="FAM"/>
+		</restriction>
+	</simpleType>
+	<complexType name="DentalClassifierType">
+		<annotation>
+			<documentation>Code is the dental class number. Description is the text for that number.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="common:CodeDescriptionType"/>
+		</complexContent>
+	</complexType>
+	<simpleType name="FormEnum">
+		<annotation>
+			<documentation>
+				C-the request is for Corporate forms only; the product line of business/product type info is not needed. 
+				R-the request is for Rating forms only; the product line of business/product type info is not needed.
+				N-the request is for Product Type info only; the forms info is not needed.
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="[CRN]"/>
+		</restriction>
+	</simpleType>
+	<complexType name="FormNumberType">
+		<attribute name="number" type="string" use="required"/>
+	</complexType>
+	<simpleType name="PPONetworkEnum">
+		<annotation>
+			<documentation>I = InNetwork only, O = Out Of Network onlt, B = Both</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="[BIO]"/>
+		</restriction>
+	</simpleType>
+</schema>

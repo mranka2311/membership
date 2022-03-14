@@ -1,0 +1,13 @@
+{
+  "headerArea": {
+    "systemEnvironmentCode": "QA",
+    "messageId": "mock-request"
+  },
+  "payloadArea": {
+       "eid": "123",
+       "startDate": "2021-01-01",
+       "businessChannel": "BCN",
+       "rosterFlag": "Y",
+       "endDate": "2021-01-01" 
+  } 
+}

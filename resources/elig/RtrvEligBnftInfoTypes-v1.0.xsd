@@ -1,0 +1,792 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by BCBSM (Blue Cross Blue Shield of MI) -->
+<schema targetNamespace="urn:rtrveligbnftinfo1_0.elig.schema.bcbsm.com" xmlns:tns="urn:rtrveligbnftinfo1_0.elig.schema.bcbsm.com" xmlns:meta="urn:meta1_1.schema.bcbsm.com" xmlns:mbr="urn:mbr2_1.schema.bcbsm.com" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0.0">
+	<!--
+	=================== Change Log ===================
+		
+		Version		: update to include 1.0.3 common types
+		Date		: 12/01/2014
+		Details		: 
+		
+		Version		: 1.0.0
+		Date		: 05/05/2010
+		Details		: Initial Version
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+	<import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="../mbr/MbrTypes-v2.1.xsd"/>
+	<element name="RtrvEligBnftInfoRequest">
+		<annotation>
+			<documentation>Request message for retrieving subscriber or dependent contract eligibility and benefit information.</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:RtrvEligBnftInfoReqPayloadType">
+							<annotation>
+								<documentation>Is where the information that the message carries is provided</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="RtrvEligBnftInfoResponse">
+		<annotation>
+			<documentation>Response message for retrieving subscriber or dependent contract eligibility and benefit information.</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:RtrvEligBnftInfoRespPayloadType" minOccurs="0">
+							<annotation>
+								<documentation>Is where the information that the message carries is provided</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<simpleType name="ContractSourceEnum">
+		<annotation>
+			<documentation>BX, MEDICAID, MEDICARE, LOCAL, NASCO, BCN, MA, DENTAL, DENTAL-MA, MICHILD</documentation>
+		</annotation>
+		<restriction base="normalizedString">
+			<enumeration value="BX"/>
+			<enumeration value="MEDICAID"/>
+			<enumeration value="MEDICARE"/>
+			<enumeration value="LOCAL"/>
+			<enumeration value="NASCO"/>
+			<enumeration value="BCN"/>
+			<enumeration value="MA"/>
+			<enumeration value="DENTAL"/>
+			<enumeration value="DENTAL-MA"/>
+			<enumeration value="MICHILD"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="LOBIndEnum">
+		<annotation>
+			<documentation>P, I, D, V, H</documentation>
+		</annotation>
+		<restriction base="normalizedString">
+			<enumeration value="P"/>
+			<enumeration value="I"/>
+			<enumeration value="D"/>
+			<enumeration value="V"/>
+			<enumeration value="H"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="ValidationLevelEnum">
+		<annotation>
+			<documentation>Level of (AAA) validation error.</documentation>
+		</annotation>
+		<restriction base="normalizedString">
+			<enumeration value="PAYER"/>
+			<enumeration value="PROVIDER"/>
+			<enumeration value="PATIENT"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="RelationShipCodeEnum">
+		<annotation>
+			<documentation>01 - Spouse, 19 - Child, 34 - other adult.</documentation>
+		</annotation>
+		<restriction base="normalizedString">
+			<enumeration value="01"/>
+			<enumeration value="19"/>
+			<enumeration value="34"/>
+		</restriction>
+	</simpleType>
+	<complexType name="AdditionalIDType">
+		<sequence>
+			<element name="GroupOrPolicyNumber" type="string" minOccurs="0"/>
+			<element name="MemberIDNumber" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Not applicable for dependent member.</documentation>
+				</annotation>
+			</element>
+			<element name="CaseNumber" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Not applicable for dependent member.</documentation>
+				</annotation>
+			</element>
+			<element name="ContractNumber" type="string" minOccurs="0"/>
+			<element name="MedicalRecordIDNumber" type="string" minOccurs="0"/>
+			<element name="PatientAccountNumber" type="string" minOccurs="0"/>
+			<element name="HICNumber" type="string" minOccurs="0"/>
+			<element name="IDCardSerialNumber" type="string" minOccurs="0"/>
+			<element name="IDCardNumber" type="string" minOccurs="0"/>
+			<element name="IssueNumber" type="string" minOccurs="0"/>
+			<element name="InsurancePolicyNumber" type="string" minOccurs="0"/>
+			<element name="EligibilityCategory" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Applicable only for dependent member.</documentation>
+				</annotation>
+			</element>
+			<element name="MedicaidRecipientIDNumber" type="string" minOccurs="0"/>
+			<element name="SocialSecurityNumber" type="string" minOccurs="0"/>
+			<element name="AgencyClaimNumber" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="BnftInfoType">
+		<sequence>
+			<element name="ServiceTypeCode" minOccurs="0" maxOccurs="99">
+				<simpleType>
+					<restriction base="string">
+						<maxLength value="2"/>
+						<minLength value="1"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="EligOrBnftInfoCode" type="common:CodeDescriptionType">
+				<annotation>
+					<documentation>Code value is from EB01.</documentation>
+				</annotation>
+			</element>
+			<element name="CoverageLevelCode" type="common:CodeDescriptionType" minOccurs="0">
+				<annotation>
+					<documentation>Code value is from EB02.</documentation>
+				</annotation>
+			</element>
+			<element name="InsuranceTypeCode" type="common:CodeDescriptionType" minOccurs="0">
+				<annotation>
+					<documentation>Code value is from EB04.</documentation>
+				</annotation>
+			</element>
+			<element name="PlanCoverageDescription" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB05.</documentation>
+				</annotation>
+			</element>
+			<element name="TimePeriodQualifier" type="common:CodeDescriptionType" minOccurs="0">
+				<annotation>
+					<documentation>Code value is from EB06.</documentation>
+				</annotation>
+			</element>
+			<element name="MonetaryAmount" type="common:CurrencyType" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB07.</documentation>
+				</annotation>
+			</element>
+			<element name="BnftPercent" type="decimal" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB08.</documentation>
+				</annotation>
+			</element>
+			<element name="QuantityQualifier" type="common:CodeDescriptionType" minOccurs="0">
+				<annotation>
+					<documentation>Code value is from EB09.</documentation>
+				</annotation>
+			</element>
+			<element name="BnftQuantity" type="int" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB10.</documentation>
+				</annotation>
+			</element>
+			<element name="AuthOrCertInd" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB11.</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="string">
+						<pattern value="[YNU]"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="InPlanNetworkInd" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB12.</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="string">
+						<pattern value="[YNUW]"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="ProcedureCodeQualifier" type="common:CodeDescriptionType" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB13-1.</documentation>
+				</annotation>
+			</element>
+			<element name="ProcedureCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB13-2.</documentation>
+				</annotation>
+			</element>
+			<element name="ProcedureModifier" minOccurs="0" maxOccurs="4">
+				<annotation>
+					<documentation>Value is from EB13-3 to EB13-6.</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="string">
+						<maxLength value="2"/>
+						<minLength value="2"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="EndOfRangeProcedureCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Value is from EB13-8.</documentation>
+				</annotation>
+			</element>
+			<element name="DiagnosisCodePointer" minOccurs="0">
+				<complexType>
+					<sequence>
+						<element name="First">
+							<annotation>
+								<documentation>Value is from EB14-1.</documentation>
+							</annotation>
+							<simpleType>
+								<restriction base="int">
+									<minInclusive value="1"/>
+									<maxInclusive value="8"/>
+								</restriction>
+							</simpleType>
+						</element>
+						<element name="Second" minOccurs="0">
+							<annotation>
+								<documentation>Value is from EB14-2.</documentation>
+							</annotation>
+							<simpleType>
+								<restriction base="int">
+									<minInclusive value="1"/>
+									<maxInclusive value="8"/>
+								</restriction>
+							</simpleType>
+						</element>
+						<element name="Third" minOccurs="0">
+							<annotation>
+								<documentation>Value is from EB14-3.</documentation>
+							</annotation>
+							<simpleType>
+								<restriction base="int">
+									<minInclusive value="1"/>
+									<maxInclusive value="8"/>
+								</restriction>
+							</simpleType>
+						</element>
+						<element name="Fourth" minOccurs="0">
+							<annotation>
+								<documentation>Value is from EB14-4.</documentation>
+							</annotation>
+							<simpleType>
+								<restriction base="int">
+									<minInclusive value="1"/>
+									<maxInclusive value="8"/>
+								</restriction>
+							</simpleType>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="ServicesDelivery" minOccurs="0" maxOccurs="9">
+				<complexType>
+					<sequence>
+						<element name="QuantityQualifier" type="common:CodeDescriptionType" minOccurs="0">
+							<annotation>
+								<documentation>Code value from HSD01.</documentation>
+							</annotation>
+						</element>
+						<element name="Quantity" type="int" minOccurs="0">
+							<annotation>
+								<documentation>Value from HSD02.</documentation>
+							</annotation>
+						</element>
+						<element name="UnitOrBasisMeasurement" type="common:CodeDescriptionType" minOccurs="0">
+							<annotation>
+								<documentation>Code value from HSD03.</documentation>
+							</annotation>
+						</element>
+						<element name="SamplingFrequency" type="decimal" minOccurs="0">
+							<annotation>
+								<documentation>Value from HSD04.</documentation>
+							</annotation>
+						</element>
+						<element name="TimePeriodQualifier" type="common:CodeDescriptionType" minOccurs="0">
+							<annotation>
+								<documentation>Code value from HSD05.</documentation>
+							</annotation>
+						</element>
+						<element name="PeriodCount" type="int" minOccurs="0">
+							<annotation>
+								<documentation>Value from HSD06.</documentation>
+							</annotation>
+						</element>
+						<element name="DeliveryFrequency" type="common:CodeDescriptionType" minOccurs="0">
+							<annotation>
+								<documentation>Code value from HSD07.</documentation>
+							</annotation>
+						</element>
+						<element name="DeliveryPatternTime" type="common:CodeDescriptionType" minOccurs="0">
+							<annotation>
+								<documentation>Code value from HSD08.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="RespAdditionalID" type="tns:RespAdditionalIDType" minOccurs="0"/>
+			<element name="RespMemberDate" type="tns:RespMemberDateType" minOccurs="0"/>
+			<element name="Message" type="string" minOccurs="0" maxOccurs="10"/>
+			<element name="AdditionalBnftInfo" minOccurs="0">
+				<complexType>
+					<sequence>
+						<element name="NatureOfInjuryCode" type="string" minOccurs="0">
+							<annotation>
+								<documentation>Code value from III02 when III01='GR' or 'NI'.</documentation>
+							</annotation>
+						</element>
+						<element name="FacilityType" type="common:CodeDescriptionType" minOccurs="0">
+							<annotation>
+								<documentation>Code value from III02 when III01='ZZ'.</documentation>
+							</annotation>
+						</element>
+						<element name="InjuredBodyPartName" type="string" minOccurs="0">
+							<annotation>
+								<documentation>Code value from III04 when III03='44'.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="BnftRelatedEntity" minOccurs="0" maxOccurs="23">
+				<complexType>
+					<sequence>
+						<element name="Entity" type="common:CodeDescriptionType" minOccurs="0">
+							<annotation>
+								<documentation>Code value is from NM101.</documentation>
+							</annotation>
+						</element>
+						<element name="Name" type="common:NameType" minOccurs="0"/>
+						<element name="EntityIDInfo" minOccurs="0">
+							<complexType>
+								<sequence>
+									<element name="NPI" type="string" minOccurs="0"/>
+									<element name="ProviderCode" type="string" minOccurs="0"/>
+									<element name="PayerID" type="string" minOccurs="0"/>
+									<element name="MemberID" type="string" minOccurs="0"/>
+								</sequence>
+							</complexType>
+						</element>
+						<element name="EntityRelationshipCode" type="common:CodeDescriptionType" minOccurs="0">
+							<annotation>
+								<documentation>Code value is from NM110</documentation>
+							</annotation>
+						</element>
+						<element name="Address" type="common:AddressType" minOccurs="0"/>
+						<element name="ContactInfo" type="tns:ContactInfoType" minOccurs="0"/>
+						<element name="BillingProviderTaxonomyCode" type="string" minOccurs="0">
+							<annotation>
+								<documentation>PRV01 when PRV01='BI' and PRV02='PXC'.-</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ContactInfoType">
+		<all>
+			<element name="Name" type="string" minOccurs="0"/>
+			<element name="EDIAccessNumber" type="string" minOccurs="0"/>
+			<element name="Email" type="string" minOccurs="0"/>
+			<element name="TelephoneNumber" type="string" minOccurs="0"/>
+			<element name="TelephoneExtension" type="string" minOccurs="0"/>
+			<element name="WorkPhoneNumber" type="string" minOccurs="0"/>
+			<element name="FaxNumber" type="string" minOccurs="0"/>
+			<element name="URL" type="string" minOccurs="0"/>
+		</all>
+	</complexType>
+	<complexType name="MemberDateType">
+		<sequence>
+			<element name="IssueDate" type="date" minOccurs="0"/>
+			<element name="Plan" type="common:DateRangeType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="MemberInfoType">
+		<sequence>
+			<element name="SubscriberInd" type="common:YesNoIndicatorEnum">
+				<annotation>
+					<documentation>Indicate whether this member info belongs to Subscriber or not, should be Y or N</documentation>
+				</annotation>
+			</element>
+			<element name="Name" type="common:NameType" minOccurs="0"/>
+			<element name="Address" type="common:AddressType" minOccurs="0"/>
+			<element name="DateOfBirth" type="date" minOccurs="0"/>
+			<element name="GenderIndicator" minOccurs="0">
+				<annotation>
+					<documentation>Allowed values M, F or U.</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="string">
+						<pattern value="[MFU]"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="BirthSeqenceNumber" type="int" minOccurs="0">
+				<annotation>
+					<documentation>Number identifying birth sequence for multiple births.</documentation>
+				</annotation>
+			</element>
+			<element name="DiagnosisCode" minOccurs="0" maxOccurs="8">
+				<complexType>
+					<sequence>
+						<element name="ICD9" type="string" minOccurs="0"/>
+						<element name="ICD10" type="string" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="TaxonomyCode" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="PayerInfoType">
+		<sequence>
+			<element name="Name" type="common:NameType" minOccurs="0"/>
+			<element name="PayerID" type="string" minOccurs="0"/>
+			<element name="ContactInfo" type="tns:ContactInfoType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="ProviderInfoType">
+		<annotation>
+			<documentation>Provider Information.  Last name can represent Oraganization as well.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Name" type="common:NameType" minOccurs="0"/>
+			<element name="ProviderIDInfo" minOccurs="0">
+				<complexType>
+					<sequence>
+						<element name="NPI" type="string" minOccurs="0"/>
+						<element name="ProviderCode" type="string" minOccurs="0"/>
+					</sequence>
+				</complexType>
+			</element>
+			<element name="Address" type="common:AddressType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="ReqValidationType">
+		<sequence>
+			<element name="ValidationLevel" type="tns:ValidationLevelEnum"/>
+			<element name="ValidReqInd" type="common:YesNoIndicatorEnum">
+				<annotation>
+					<documentation>AAA01</documentation>
+				</annotation>
+			</element>
+			<element name="RejectReason" type="common:CodeDescriptionType">
+				<annotation>
+					<documentation>AAA03</documentation>
+				</annotation>
+			</element>
+			<element name="FollowUpAction" type="common:CodeDescriptionType">
+				<annotation>
+					<documentation>AAA04</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="RespAdditionalIDType">
+		<complexContent>
+			<extension base="tns:AdditionalIDType">
+				<sequence>
+					<element name="Plan" minOccurs="0">
+						<complexType>
+							<sequence>
+								<element name="Number" type="string" minOccurs="0"/>
+								<element name="Name" type="string" minOccurs="0"/>
+							</sequence>
+						</complexType>
+					</element>
+					<element name="Group" minOccurs="0">
+						<complexType>
+							<complexContent>
+								<extension base="mbr:GroupIdentifier">
+									<sequence>
+										<element name="Name" type="string" minOccurs="0"/>
+									</sequence>
+								</extension>
+							</complexContent>
+						</complexType>
+					</element>
+					<element name="PlanNetworkID" minOccurs="0">
+						<complexType>
+							<sequence>
+								<element name="Number" type="string"/>
+								<element name="Name" type="string" minOccurs="0"/>
+							</sequence>
+						</complexType>
+					</element>
+					<element name="FamilyUnitNumber" type="string" minOccurs="0"/>
+					<element name="PriorIDNumber" type="string" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="RespMemberDateType">
+		<sequence>
+			<element name="Discharge" type="common:DateRangeType" minOccurs="0"/>
+			<element name="Issue" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="EffectiveDateOfChange" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="PeriodStart" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at benefit level</documentation>
+				</annotation>
+			</element>
+			<element name="PeriodEnd" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at benefit level</documentation>
+				</annotation>
+			</element>
+			<element name="Completion" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at benefit level</documentation>
+				</annotation>
+			</element>
+			<element name="COB" type="common:DateRangeType" minOccurs="0"/>
+			<element name="Plan" type="common:DateRangeType" minOccurs="0"/>
+			<element name="Bnft" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at benefit level</documentation>
+				</annotation>
+			</element>
+			<element name="PCP" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at benefit level</documentation>
+				</annotation>
+			</element>
+			<element name="LastVisitOrConsultation" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at benefit level</documentation>
+				</annotation>
+			</element>
+			<element name="Eligibility" type="common:DateRangeType" minOccurs="0"/>
+			<element name="Added" type="common:DateRangeType" minOccurs="0"/>
+			<element name="COBRABegin" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="COBRAEnd" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="PremiumPaidToDateBegin" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="PremiumPaidToDateEnd" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="PlanBegin" type="common:DateRangeType" minOccurs="0"/>
+			<element name="PlanEnd" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="BnftBegin" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at benefit level</documentation>
+				</annotation>
+			</element>
+			<element name="BnftEnd" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at benefit level</documentation>
+				</annotation>
+			</element>
+			<element name="EligibilityBegin" type="common:DateRangeType" minOccurs="0"/>
+			<element name="EligibilityEnd" type="common:DateRangeType" minOccurs="0"/>
+			<element name="Enrollment" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="Admission" type="common:DateRangeType" minOccurs="0"/>
+			<element name="DateOfDeath" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="Certification" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="Service" type="common:DateRangeType" minOccurs="0"/>
+			<element name="PolicyEffective" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="PolicyExpiration" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>Present only at member level</documentation>
+				</annotation>
+			</element>
+			<element name="DateOfLastUpdate" type="common:DateRangeType" minOccurs="0"/>
+			<element name="Status" type="common:DateRangeType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="RtrvEligBnftInfoReqPayloadType">
+		<annotation>
+			<documentation>Payload for request message.</documentation>
+		</annotation>
+		<sequence>
+			<element name="ContractSource" type="tns:ContractSourceEnum" minOccurs="0">
+				<annotation>
+					<documentation>Source of Contract.  eg: BX, MEDICAID, MEDICARE, LOCAL, NASCO, BCN, MA, MCHILD etc</documentation>
+				</annotation>
+			</element>
+			<element name="LOBInd" type="tns:LOBIndEnum" minOccurs="0">
+				<annotation>
+					<documentation>Line of Business Indicator.  eg: P, I, D, V, H etc</documentation>
+				</annotation>
+			</element>
+			<element name="ProvAuthRequiredInd" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Provider Authorization Required or not, should be 'Y' or 'N'</documentation>
+				</annotation>
+			</element>
+			<element name="ProviderInfo" type="tns:ProviderInfoType">
+				<annotation>
+					<documentation>Provider Information.  Last name can represent Oraganization as well.</documentation>
+				</annotation>
+			</element>
+			<element name="ContractNumber">
+				<simpleType>
+					<restriction base="string">
+						<minLength value="4"/>
+						<maxLength value="17"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="ReqMemberInfo" maxOccurs="2">
+				<complexType>
+					<complexContent>
+						<extension base="tns:MemberInfoType">
+							<sequence>
+								<element name="ReqAdditionalID" minOccurs="0">
+									<complexType>
+										<complexContent>
+											<extension base="tns:AdditionalIDType">
+												<sequence>
+													<element name="PlanNumber" type="string" minOccurs="0"/>
+													<element name="Group" type="mbr:GroupIdentifier" minOccurs="0"/>
+													<element name="PlanNetworkIDNumber" minOccurs="0"/>
+												</sequence>
+											</extension>
+										</complexContent>
+									</complexType>
+								</element>
+								<element name="IndRelationshipCode" type="tns:RelationShipCodeEnum" minOccurs="0">
+									<annotation>
+										<documentation>Applicable for dependent member info.</documentation>
+									</annotation>
+								</element>
+								<element name="ReqMemberDate" type="tns:MemberDateType" minOccurs="0"/>
+							</sequence>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="ServiceTypeCode" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="RtrvEligBnftInfoRespPayloadType">
+		<annotation>
+			<documentation>Payload for response message.</documentation>
+		</annotation>
+		<sequence>
+			<element name="ReqValidation" type="tns:ReqValidationType" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="PayerInfo" type="tns:PayerInfoType" minOccurs="0">
+				<annotation>
+					<documentation>Payer Information.  Last name can represent Oraganization as well.</documentation>
+				</annotation>
+			</element>
+			<element name="ProviderInfo" type="tns:ProviderInfoType" minOccurs="0">
+				<annotation>
+					<documentation>Provider Information.  Last name can represent Oraganization as well.</documentation>
+				</annotation>
+			</element>
+			<element name="ContractNumber" minOccurs="0">
+				<simpleType>
+					<restriction base="string">
+						<minLength value="4"/>
+						<maxLength value="17"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="RespMemberInfo" minOccurs="0" maxOccurs="2">
+				<complexType>
+					<complexContent>
+						<extension base="tns:MemberInfoType">
+							<sequence>
+								<element name="SubmittedInfoChangedInd" type="common:YesNoIndicatorEnum" minOccurs="0">
+									<annotation>
+										<documentation>This flag is set when submitted member info. is corrected in reponse.</documentation>
+									</annotation>
+								</element>
+								<element name="IndRelationshipCode" type="common:CodeDescriptionType" minOccurs="0">
+									<annotation>
+										<documentation>Applicable for dependent member info.  Code values are from INS03</documentation>
+									</annotation>
+								</element>
+								<element name="RespAdditionalID" type="tns:RespAdditionalIDType" minOccurs="0"/>
+								<element name="RespMemberDate" type="tns:RespMemberDateType" minOccurs="0"/>
+								<element name="MilitaryInfo" minOccurs="0">
+									<complexType>
+										<sequence>
+											<element name="InfoStatus" type="common:CodeDescriptionType" minOccurs="0">
+												<annotation>
+													<documentation>Code value is from MPI01</documentation>
+												</annotation>
+											</element>
+											<element name="EmpStatus" type="common:CodeDescriptionType" minOccurs="0">
+												<annotation>
+													<documentation>Code value is from MPI02</documentation>
+												</annotation>
+											</element>
+											<element name="Affiliation" type="common:CodeDescriptionType" minOccurs="0">
+												<annotation>
+													<documentation>Code value is from MPI03</documentation>
+												</annotation>
+											</element>
+											<element name="Description" type="string" minOccurs="0">
+												<annotation>
+													<documentation>Value is from MPI04</documentation>
+												</annotation>
+											</element>
+											<element name="MilitaryServiceRank" type="common:CodeDescriptionType" minOccurs="0">
+												<annotation>
+													<documentation>Code value is from MPI05</documentation>
+												</annotation>
+											</element>
+											<element name="Service" type="common:DateRangeType" minOccurs="0">
+												<annotation>
+													<documentation>Values are from MPI07</documentation>
+												</annotation>
+											</element>
+										</sequence>
+									</complexType>
+								</element>
+							</sequence>
+						</extension>
+					</complexContent>
+				</complexType>
+			</element>
+			<element name="BnftInfo" type="tns:BnftInfoType" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+</schema>

@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:common3_0.schema.bcbsm.com" xmlns:tns="urn:common3_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="3.0.0">
+	<!--
+	=================== Change Log ===================
+		Version	: 3.0.0
+		Date		: 9/24/2014
+		Details		: Altered content to move to a new model of SOA communication.
+			Eliminating many common types and extracting simpler and more useful content from those to here.
+			* Added AddressDetailType, AddressStreetType, InclusiveDateType, PersonNameType, NonPersonNameType, PhoneDetailType, PersonInfoType, CanonicalExtType, NumberIdentifier, SuffixedIdentifier
+			* Modified AddressType to declare Street as AddressStreetType
+			* Changed NameType to PersonNameType
+			* Changed SegmentedDateType to include enumerated values for Month and Day.
+			* Removed BooleanIndicatorEnum as it is redundant to either boolean or YesNoIndicatorEnum
+			* Removed BusinessChannelType as concept is too amorphous
+			* Removed ContactInfoDetailedType and ContactInfoType as they do not seem to belong in a common concept (they change too much based upon context)
+			* Removed DateRangeType (Renamed to InclusiveDateType)
+			* Removed MatchEnum
+			* Removed NameType (replaced with PersonNameType or NonPersonNamType or can make a choice between the two in the parent schema)
+			* Removed PersonalInfoType (replaced with PersonInfoType which has a DOB of date type)
+			* Removed PhoneNumberDetailedType (replaced with PhoneDetailType)
+			
+
+		Version	: 2.0.3
+		Date		: 9/10/2010
+		Details		: PhoneNumber in ContactInfoType changed to a string.
+	
+		Version	: 2.0.2
+		Date		: 12/9/2008
+		Details		: Change the Code and Description to Code Description type to optional.
+				Phone Number Area code is optional
+				Change the EffectiveDate in ExpirableType to optional
+				DateOfBirth in PersonalInfoType to optional
+				Year in SegmentedDateType to optional
+	
+		Version	: 2.0.1
+		Date		: 9/11/2008
+		Details		: Added namespace alterations. 
+
+		Version	: 2.0
+		Date		: 8/19/2008
+		Details		: BusinessChannelEnum: removed restriction, renamed to BusinessChannelType. Adding MTV (Metavance) to enum. Removing MOS.
+				NameType: Added prefix. Updated MiddleName to Middle. 
+
+
+		Version	: 1.0
+		Date		: 4/25/2008
+		Details		: Initial version.
+-->
+	<complexType name="AddressDetailType">
+		<complexContent>
+			<extension base="tns:AddressType">
+				<sequence>
+					<element name="TypeInd" type="string" minOccurs="0"/>
+					<element name="Dates" type="tns:ExpirableDateType" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="AddressType">
+		<sequence>
+			<element name="Street" type="tns:AddressStreetType" minOccurs="0" maxOccurs="10"/>
+			<element name="City" type="string" minOccurs="0"/>
+			<element name="County" type="string" minOccurs="0"/>
+			<element name="StateProvince" type="string" minOccurs="0"/>
+			<element name="PostalCode" type="string" minOccurs="0"/>
+			<element name="Country" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="AddressStreetType">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="line" type="short" use="optional"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="CodeDescriptionType">
+		<annotation>
+			<documentation>Informational element that is used to provide information about the state of the information retrieved,</documentation>
+		</annotation>
+		<sequence>
+			<element name="Code" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Code representation of an attribute </documentation>
+				</annotation>
+			</element>
+			<element name="Description" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Descriptive representation of an attribute</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<simpleType name="CurrencyType">
+		<restriction base="decimal">
+			<fractionDigits value="2"/>
+			<pattern value="-?\d{1,9}\.\d{2}"/>
+		</restriction>
+	</simpleType>
+	<complexType name="ExpirableDateType">
+		<annotation>
+			<documentation>Indicates a effective and expiration date of a period.  Use this when the range reported is inclusive of the effective and exclusive of the expiration date.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Effective" type="date" minOccurs="0">
+				<annotation>
+					<documentation>Indicates the first date of a date range.</documentation>
+				</annotation>
+			</element>
+			<element name="Expiration" type="date" minOccurs="0">
+				<annotation>
+					<documentation>Indicates the first date on which the tagged item is no longer applicable.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<simpleType name="GenderIndicatorType">
+		<restriction base="string">
+			<pattern value="[MFU]"/>
+		</restriction>
+	</simpleType>
+	<complexType name="InclusiveDateType">
+		<annotation>
+			<documentation>Indicates a start and end date of a period.  Use this when the range reported is inclusive of both dates.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Start" type="date" minOccurs="0">
+				<annotation>
+					<documentation>Indicates the first date of a date range.</documentation>
+				</annotation>
+			</element>
+			<element name="End" type="date" minOccurs="0">
+				<annotation>
+					<documentation>Indicates the last date of a date range.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<simpleType name="LOBCodeType">
+		<annotation>
+			<documentation>Code mapped to BCBSM LOBs as follows for example:
+D = Dental
+F = Facility
+P = Professional
+M = Medical (F + P)
+H = Hearing
+V = Vision
+X = Pharmacy
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<length value="1"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="NonNegativeCurrencyType">
+		<restriction base="decimal">
+			<fractionDigits value="2"/>
+			<pattern value="\d{1,9}\.\d{2}"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="NonPersonNameType">
+		<annotation>
+			<documentation>
+			Name for a non-person such as a business, trust, or other financial or government entity.
+			This is provided as a counterpart to the PersonNameType.  It may be used if the entity is known not to be a person
+			or in a choice concept within the parent schema to help differentiate between the data pertaining to a person or non-person.
+			</documentation>
+		</annotation>
+		<restriction base="string"/>
+	</simpleType>
+	<complexType name="NumberIdentifier">
+		<annotation>
+			<documentation>Number that can be used to identify an item.  Specific format should be presented by the elements realizing this type.  Note this fields usage will make the Number required.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Number" type="string"/>
+		</sequence>
+	</complexType>
+	<complexType name="PersonInfoType">
+		<annotation>
+			<documentation>Information about a person including their name, date of birth, and gender.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Name" type="tns:PersonNameType" minOccurs="0"/>
+			<element name="DateOfBirth" type="date" minOccurs="0"/>
+			<element name="Gender" type="tns:GenderIndicatorType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="PersonNameType">
+		<annotation>
+			<documentation>
+			Name for a person  It may be used if the entity is known to be a person
+			or in a choice concept within the parent schema to help differentiate between the data pertaining to a person or non-person.
+			</documentation>
+		</annotation>
+		<sequence>
+			<element name="Prefix" type="string" minOccurs="0"/>
+			<element name="First" type="string" minOccurs="0"/>
+			<element name="Last" type="string" minOccurs="0"/>
+			<element name="Middle" type="string" minOccurs="0"/>
+			<element name="Suffix" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="PhoneDetailType">
+		<annotation>
+			<documentation>This phone type breaks the component parts into individual elements as well as applies attributes for separating different phones from one another.</documentation>
+		</annotation>
+		<sequence>
+			<element name="AreaCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>3 digit area code</documentation>
+				</annotation>
+			</element>
+			<element name="Exchange" type="string" minOccurs="0">
+				<annotation>
+					<documentation>3 digit prefix to the number</documentation>
+				</annotation>
+			</element>
+			<element name="Number" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Number of 4 digits</documentation>
+				</annotation>
+			</element>
+			<element name="Extension" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Extension to the phone number</documentation>
+				</annotation>
+			</element>
+			<element name="TypeInd" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Type of phone number - FAX, HOME, CELL, MOBILE, BUSINESS, or codified other concepts.</documentation>
+				</annotation>
+			</element>
+			<element name="Dates" type="tns:ExpirableDateType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="SegmentedDateType">
+		<annotation>
+			<documentation>Use in scenarios where consumer has the ability to perceive or request by a portion of the date or perhaps the whole date - both scenarios apply.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Year" minOccurs="0">
+				<simpleType>
+					<restriction base="string">
+						<pattern value="\d{4}"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="Month" minOccurs="0">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="01"/>
+						<enumeration value="02"/>
+						<enumeration value="03"/>
+						<enumeration value="04"/>
+						<enumeration value="05"/>
+						<enumeration value="06"/>
+						<enumeration value="07"/>
+						<enumeration value="08"/>
+						<enumeration value="09"/>
+						<enumeration value="10"/>
+						<enumeration value="11"/>
+						<enumeration value="12"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="Day" minOccurs="0">
+				<simpleType>
+					<restriction base="string">
+						<enumeration value="01"/>
+						<enumeration value="02"/>
+						<enumeration value="03"/>
+						<enumeration value="04"/>
+						<enumeration value="05"/>
+						<enumeration value="06"/>
+						<enumeration value="07"/>
+						<enumeration value="08"/>
+						<enumeration value="09"/>
+						<enumeration value="10"/>
+						<enumeration value="11"/>
+						<enumeration value="12"/>
+						<enumeration value="13"/>
+						<enumeration value="14"/>
+						<enumeration value="15"/>
+						<enumeration value="16"/>
+						<enumeration value="17"/>
+						<enumeration value="18"/>
+						<enumeration value="19"/>
+						<enumeration value="20"/>
+						<enumeration value="21"/>
+						<enumeration value="22"/>
+						<enumeration value="23"/>
+						<enumeration value="24"/>
+						<enumeration value="25"/>
+						<enumeration value="26"/>
+						<enumeration value="27"/>
+						<enumeration value="28"/>
+						<enumeration value="29"/>
+						<enumeration value="30"/>
+						<enumeration value="31"/>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="SuffixedIdentifier">
+		<complexContent>
+			<extension base="tns:NumberIdentifier">
+				<sequence>
+					<element name="Suffix" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Number suffix is a subset categorization under a number identifier pertaining to a specific item.  Specific format should be presented by the elements realizing this type.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<simpleType name="YesNoIndicatorType">
+		<restriction base="string">
+			<pattern value="[YN]"/>
+		</restriction>
+	</simpleType>
+</schema>

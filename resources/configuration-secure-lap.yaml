@@ -1,0 +1,11 @@
+passwordToKey: "![MuCb9GjkHuDVFtR/OTgRAA==]"
+passwordToKeyStore: "![MuCb9GjkHuDVFtR/OTgRAA==]"
+passwordToTrustStore: "![MuCb9GjkHuDVFtR/OTgRAA==]"
+
+
+
+bpldsmembershipInfo:
+  clientSecret: "password"
+
+security:
+  password : "password"

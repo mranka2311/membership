@@ -1,0 +1,10 @@
+leh:
+  serviceVersion: "2.1"
+  schemaVersion: "2.1.2"
+  
+  
+  
+dce:
+  serviceVersion: "2.0"
+  schemaVersion: "2.1.20"
+

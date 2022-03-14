@@ -1,0 +1,44 @@
+# *** API Listener Configurations ***
+api:
+  host: "0.0.0.0"
+  path: "/v1.0/*"
+  autodiscoveryId: "11111111"
+  name: "bpgetmembership"
+  timeout: "30000"
+security:
+  username : "simschprod"  
+https:
+  private:
+    port: "8092"                                                                               
+                                                                                                                   
+# *** Library Configurations *** 
+
+soapreqconst:
+  username: "simschprod"  
+bpldsmembershipInfo:
+  host: "prod-dlb-api2api.bcbsm.com"
+  port: "443"
+  basePath: "/prod-api2api/bpldsmembershipinfo-bcbsm/v1.0"
+  resource: "/contractRoster"
+  clientId : "17fac1cb704c4ea3b4a65e38b847ae53"
+  responseTimeOutMS : "30000"
+  
+wsc:
+  wsc_leh: 
+    address: "https://servicestierdp1prd.bcbsm.com:61003/Elig/LocateEligHist/2.1"
+    operation: LocateHistories
+    port: LocateEligHistPort
+    service: LocateEligHist
+    wsdlLocation: "wsdl/LocateEligHist.wsdl"
+    timeout: "30000"
+  wsc_dce: 
+    address: "https://servicestierdp1prd.bcbsm.com:61003/Elig/DeterEligibility/2.0"
+    operation: GetEligbility
+    port: DeterEligibilityPort
+    service: DeterEligibility
+    wsdlLocation: "wsdl/DeterEligibility.wsdl"
+    timeout: "30000"
+  
+insecure : "false" 
+trustStorePath: "prod_dlb_api2api.bcbsm.com.p12"
+successCodeValidator: "200,201,400,500,503,404"

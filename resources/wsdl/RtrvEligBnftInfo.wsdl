@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="RtrvEligBnftInfo" targetNamespace="urn:rtrveligbnftinfo1_0.service.cs.bcbsm.com" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:reb="urn:rtrveligbnftinfo1_0.elig.schema.bcbsm.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:rtrveligbnftinfo1_0.service.cs.bcbsm.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:import namespace="urn:rtrveligbnftinfo1_0.elig.schema.bcbsm.com" schemaLocation="elig/RtrvEligBnftInfoTypes-v1.0.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="RtrvEligBnftInfoResponse">
+		<wsdl:part element="reb:RtrvEligBnftInfoResponse" name="response"/>
+	</wsdl:message>
+	<wsdl:message name="RtrvEligBnftInfoRequest">
+		<wsdl:part element="reb:RtrvEligBnftInfoRequest" name="request"/>
+	</wsdl:message>
+	<wsdl:portType name="RtrvEligBnftInfoService">
+		<wsdl:operation name="doTransaction">
+			<wsdl:input message="tns:RtrvEligBnftInfoRequest"/>
+			<wsdl:output message="tns:RtrvEligBnftInfoResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="RtrvEligBnftInfoBinding" type="tns:RtrvEligBnftInfoService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="doTransaction">
+			<soap:operation soapAction="urn:rtrveligbnftinfo1_0.service.cs.bcbsm.com/doTransaction"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="RtrvEligBnftInfo">
+		<wsdl:port binding="tns:RtrvEligBnftInfoBinding" name="RtrvEligBnftInfoPort">
+			<soap:address location="http://localhost:9080/RtrvEligBnftInfoWeb/RtrvEligBnftInfo"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

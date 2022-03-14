@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2018 sp1 (http://www.altova.com) by Altova XMLSpy 2018 Professional XML Editor, Installed for 104 users (Blue Cross Blue Shield of MI) -->
+<schema xmlns:grp="urn:group1_0.mbr.schema.bcbsm.com" xmlns:grpcust="urn:groupcust1_0.mbr.schema.bcbsm.com" xmlns:meta="urn:meta1_1.schema.bcbsm.com" xmlns:mbr="urn:mbr2_1.schema.bcbsm.com" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:groupcust1_0.mbr.schema.bcbsm.com" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0.1">
+	<!--
+	=================== Change Log ===================
+	
+		version 	:1.0.1
+		Date 		: 06/18/2018
+		Detaisl 	: Added elements AgentID, ManagingAgentID, SponsorId, VerificationFlag in RtrvGroupCustReqPayloadType 
+					  and added elements ContractSize, PHIIND and PlanSponsorCert in RtrvGroupCustRespPayloadType.
+
+		Version : 1.0.0
+		Date       : 07/28/2014
+		Details    : Added new operation RtrvGroupCust and corresponding Request and Response Payload elements.
+	
+-->
+	<import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="MbrTypes-v2.1.xsd"/>
+	<import namespace="urn:group1_0.mbr.schema.bcbsm.com" schemaLocation="GroupTypes-v1.0.xsd"/>
+	<element name="RtrvGroupCustRequest">
+		<annotation>
+			<documentation>Request for RtrvGroupCust</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="grpcust:RtrvGroupCustReqPayloadType">
+							<annotation>
+								<documentation>Payload for Retrieve Group Customer Request.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="RtrvGroupCustResponse">
+		<annotation>
+			<documentation>Response for RtrvGroupCust</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="grpcust:RtrvGroupCustRespPayloadType" minOccurs="0">
+							<annotation>
+								<documentation>Payload for Retrieve Group Cust Response.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<complexType name="RtrvGroupCustReqPayloadType">
+		<annotation>
+			<documentation>High level group customer information.</documentation>
+		</annotation>
+		<sequence>
+			<choice>
+				<element name="GroupCustomer" minOccurs="0">
+					<complexType>
+						<sequence>
+							<element name="ID" type="string" minOccurs="0"/>
+						</sequence>
+					</complexType>
+				</element>
+				<element name="ManagingAgentID" type="string" minOccurs="0"/>
+				<element name="SponsorID" type="string" minOccurs="0"/>
+				<element name="AgentID" type="string" minOccurs="0"/>
+			</choice>
+			<element name="Group" type="mbr:GroupIdentifier" minOccurs="0">
+				<annotation>
+					<documentation>The Group Number and Suffix are both required.</documentation>
+				</annotation>
+			</element>
+			<element name="RtrvGrpDetailsIND" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="RtrvGroupCustRespPayloadType">
+		<annotation>
+			<documentation>High level group customer information.</documentation>
+		</annotation>
+		<sequence>
+			<element name="GroupDetails" type="grp:RtrvGrpDetailRespPayloadType" maxOccurs="100"/>
+		</sequence>
+	</complexType>
+</schema>

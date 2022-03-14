@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://schemas.xmlsoap.org/wsdl/" name="DeterEligibilityService-v2.0" targetNamespace="urn:deterctrctelig2_0.service.cs.bcbsm.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:svc="urn:deterctrctelig2_1.elig.schema.bcbsm.com" xmlns:tns="urn:deterctrctelig2_0.service.cs.bcbsm.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<types>
+		<xsd:schema>
+			<xsd:import namespace="urn:deterctrctelig2_1.elig.schema.bcbsm.com" schemaLocation="elig/DeterCtrctEligTypes-v2.1.xsd"/>
+		</xsd:schema>
+	</types>
+	
+	<message name="DeterEligibilityRequest">
+		<part element="svc:DeterEligibilityRequest" name="request"/>
+	</message>
+	<message name="DeterEligibilityResponse">
+		<part element="svc:DeterEligibilityResponse" name="response"/>
+	</message>
+	
+	<portType name="DeterEligibilityService">
+		<operation name="GetEligbility" parameterOrder="request">
+			<input message="tns:DeterEligibilityRequest" name="getEligbilityRequest"/>
+			<output message="tns:DeterEligibilityResponse" name="getEligbilityResponse"/>
+		</operation>
+	</portType>
+	
+	<binding name="DeterEligibilityBinding" type="tns:DeterEligibilityService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="GetEligbility">
+			<soap:operation soapAction="urn:deterctrctelig2_0.service.cs.bcbsm.com/getEligbility"/>
+			<input name="getEligbilityRequest">
+				<soap:body parts="request" use="literal"/>
+			</input>
+			<output name="getEligbilityResponse">
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	
+	<service name="DeterEligibility">
+		<port binding="tns:DeterEligibilityBinding" name="DeterEligibilityPort">
+			<soap:address location="http://localhost:9081/DeterEligibilityWeb/services/DeterEligibilityPort"/>
+		</port>
+	</service>
+</definitions>

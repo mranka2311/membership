@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://schemas.xmlsoap.org/wsdl/" name="Agent" targetNamespace="agent1_0.service.cs.bcbsm.com" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:sales="urn:rtrvagentinfo1_0.sales.schema.bcbsm.com" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="agent1_0.service.cs.bcbsm.com" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<!--  
+                =================== Change Log ===================	
+	
+	      	Version       : 1.0
+		Date            : 03/10/2016
+		Details         : Initial Version
+
+     -->
+	<types>
+		<xsd:schema>
+			<xsd:import namespace="urn:rtrvagentinfo1_0.sales.schema.bcbsm.com" schemaLocation="sales/RtrvAgentInfoTypes-v1.0.xsd"/>
+		</xsd:schema>
+	</types>
+	<message name="RtrvAgentInfoRequest">
+		<part element="sales:RtrvAgentInfoRequest" name="RtrvAgentInfoRequest"/>
+	</message>
+	<message name="RtrvAgentInfoResponse">
+		<part element="sales:RtrvAgentInfoResponse" name="RtrvAgentInfoResponse"/>
+	</message>
+	<portType name="AgentService">
+		<operation name="rtrvAgentInfo">
+			<input message="tns:RtrvAgentInfoRequest" name="RtrvAgentInfoInput"/>
+			<output message="tns:RtrvAgentInfoResponse" name="RtrvAgentInfoOutput"/>
+		</operation>
+	</portType>
+	<binding name="AgentBinding" type="tns:AgentService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="rtrvAgentInfo">
+			<soap:operation soapAction="urn:agent1_0.service.cs.bcbsm.com/rtrvAgentInfo"/>
+			<input name="RtrvAgentInfoInput">
+				<soap:body use="literal"/>
+			</input>
+			<output name="RtrvAgentInfoOutput">
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="Agent">
+		<port binding="tns:AgentBinding" name="AgentPort">
+			<soap:address location="http://localhost:9080/AgentWeb/1.0/Agent"/>
+		</port>
+	</service>
+</definitions>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by BCBSM (Blue Cross Blue Shield of MI) -->
+<schema targetNamespace="urn:getgrpwelinfo1_0.mbr.schema.bcbsm.com" xmlns:grpwel="urn:getgrpwelinfo1_0.mbr.schema.bcbsm.com" xmlns:meta="urn:meta1_1.schema.bcbsm.com" xmlns:mbr="urn:mbr2_1.schema.bcbsm.com" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0.0">
+	<!--o-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+	<import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="MbrTypes-v2.1.xsd"/>
+	<element name="GetGrpWelInfoRequest">
+		<annotation>
+			<documentation>Request for GetGrpWelInfo</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="grpwel:GetGrpWelInfoReqPayloadType">
+							<annotation>
+								<documentation>Payload for GetGrpWelInfo Request.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="GetGrpWelInfoResponse">
+		<annotation>
+			<documentation>Response for GetGrpWelInfoResponse</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="grpwel:GetGrpWelInfoRespPayloadType" minOccurs="0">
+							<annotation>
+								<documentation>Payload for Retrieve Group Detail Response.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<complexType name="GetGrpWelInfoReqPayloadType">
+		<sequence>
+			<element name="Group" type="mbr:GroupIdentifier"/>
+		</sequence>
+	</complexType>
+	<complexType name="GetGrpWelInfoRespPayloadType">
+		<sequence>
+			<element name="GetGrpWelInfo" type="grpwel:GetGrpWelInfoType" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<complexType name="GetGrpWelInfoType">
+		<annotation>
+			<documentation>High level group information.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="mbr:GroupIdentifier">
+				<sequence>
+					<element name="GrpWellnessInfo" type="grpwel:WellnessProductType" minOccurs="0" maxOccurs="unbounded"/>
+					<element name="GrpNonWellnessInfo" type="grpwel:BPIDInfoType" minOccurs="0" maxOccurs="unbounded"/>
+				</sequence>
+				<attribute name="linkedSuffix" type="string" use="optional"/>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="BPIDInfoType">
+		<sequence>
+			<element name="BPID" type="string" minOccurs="0"/>
+			<element name="BPIDDateRange" type="common:DateRangeType" minOccurs="0"/>
+			<element name="BPIDLOBString" type="string" minOccurs="0">
+				<annotation>
+					<documentation>BPID LOB strong contains all LOB's assogned for BPID separated using pipe delimited</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="WellnessBpidsType">
+		<sequence>
+			<element name="WellnessProduct" type="grpwel:WellnessProductType" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<complexType name="WellnessProductType">
+		<sequence>
+			<element name="ProductShortName" type="string">
+				<annotation>
+					<documentation>wellness product name</documentation>
+				</annotation>
+			</element>
+			<element name="ProductLongName" type="string">
+				<annotation>
+					<documentation>wellness product long name</documentation>
+				</annotation>
+			</element>
+			<element name="BPIDInfo" type="grpwel:BPIDInfoType" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="Level" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+</schema>

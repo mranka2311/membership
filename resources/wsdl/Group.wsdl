@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions name="Group" targetNamespace="urn:group1_0.service.cs.bcbsm.com" xmlns:grp="urn:group1_0.mbr.schema.bcbsm.com" xmlns:grpadmin="urn:grpadmin1_0.mbr.schema.bcbsm.com" xmlns:grpbnftpkg="urn:grpbenfitpkg1_0.mbr.schema.bcbsm.com" xmlns:grpcust="urn:groupcust1_0.mbr.schema.bcbsm.com" xmlns:grplist="urn:grplist1_0.mbr.schema.bcbsm.com" xmlns:grpuser="urn:grpuser1_0.mbr.schema.bcbsm.com" xmlns:grpwel="urn:getgrpwelinfo1_0.mbr.schema.bcbsm.com" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:p="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:group1_0.service.cs.bcbsm.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:import namespace="urn:group1_0.mbr.schema.bcbsm.com" schemaLocation="mbr/GroupTypes-v1.0.xsd"/>
+			<xsd:import namespace="urn:getgrpwelinfo1_0.mbr.schema.bcbsm.com" schemaLocation="mbr/GetGrpWelInfoTypes-v1.0.xsd"/>
+			<xsd:import namespace="urn:groupcust1_0.mbr.schema.bcbsm.com" schemaLocation="mbr/GroupCustTypes-v1.0.xsd"/>
+			<xsd:import namespace="urn:grplist1_0.mbr.schema.bcbsm.com" schemaLocation="mbr/GroupListTypes-v1.0.xsd"/>
+			<xsd:import namespace="urn:grpuser1_0.mbr.schema.bcbsm.com" schemaLocation="mbr/GroupUserTypes-v1.0.xsd"/>
+			<xsd:import namespace="urn:grpadmin1_0.mbr.schema.bcbsm.com" schemaLocation="mbr/GroupAdminTypes-v1.0.xsd"/>
+			<xsd:import namespace="urn:grpbenfitpkg1_0.mbr.schema.bcbsm.com" schemaLocation="mbr/GroupBenfitPkgTypes-v1.0.xsd"/>
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="rtrvGrpDetailResponse">
+		<wsdl:part element="grp:RtrvGrpDetailResponse" name="rtrvGrpDetailResponse"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGrpDetailRequest">
+		<wsdl:part element="grp:RtrvGrpDetailRequest" name="rtrvGrpDetailRequest"/>
+	</wsdl:message>
+	<wsdl:message name="GetGrpWelInfoResponse">
+		<wsdl:part element="grpwel:GetGrpWelInfoResponse" name="GetGrpWelInfoResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetGrpWelInfoRequest">
+		<wsdl:part element="grpwel:GetGrpWelInfoRequest" name="GetGrpWelInfoRequest"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGroupCustResponse">
+		<wsdl:part element="grpcust:RtrvGroupCustResponse" name="rtrvGroupCustResponse"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGroupCustRequest">
+		<wsdl:part element="grpcust:RtrvGroupCustRequest" name="rtrvGroupCustRequest"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGrpListResponse">
+		<wsdl:part element="grplist:RtrvGrpListResponse" name="rtrvGrpListResponse"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGrpListRequest">
+		<wsdl:part element="grplist:RtrvGrpListRequest" name="rtrvGrpListRequest"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGrpUserResponse">
+		<wsdl:part element="grpuser:RtrvGrpUserResponse" name="rtrvGrpUserResponse"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGrpUserRequest">
+		<wsdl:part element="grpuser:RtrvGrpUserRequest" name="rtrvGrpUserRequest"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGrpAdminResponse">
+		<wsdl:part element="grpadmin:RtrvGrpAdminResponse" name="rtrvGrpAdminResponse"/>
+	</wsdl:message>
+	<wsdl:message name="rtrvGrpAdminRequest">
+		<wsdl:part element="grpadmin:RtrvGrpAdminRequest" name="rtrvGrpAdminRequest"/>
+	</wsdl:message>
+
+	<wsdl:message name="rtrvGrpBenefitPkgRequest">
+		<wsdl:part element="grpbnftpkg:RtrvGrpBenefitPkgRequest" name="rvGrpBenefitPkgRequest"/>
+	</wsdl:message>
+	
+		<wsdl:message name="rtrvGrpBenefitPkgResponse">
+		<wsdl:part element="grpbnftpkg:RtrvGrpBenefitPkgResponse" name="rvGrpBenefitPkgResponse"/>
+	</wsdl:message>
+	
+	<wsdl:portType name="GroupService">
+		<wsdl:operation name="rtrvGrpDetail">
+			<wsdl:input message="tns:rtrvGrpDetailRequest"/>
+			<wsdl:output message="tns:rtrvGrpDetailResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="getGrpWelInfo">
+			<wsdl:input message="tns:GetGrpWelInfoRequest"/>
+			<wsdl:output message="tns:GetGrpWelInfoResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGroupCust">
+			<wsdl:input message="tns:rtrvGroupCustRequest"/>
+			<wsdl:output message="tns:rtrvGroupCustResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGrpList">
+			<wsdl:input message="tns:rtrvGrpListRequest"/>
+			<wsdl:output message="tns:rtrvGrpListResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGrpUser">
+			<wsdl:input message="tns:rtrvGrpUserRequest"/>
+			<wsdl:output message="tns:rtrvGrpUserResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGrpAdmin">
+			<wsdl:input message="tns:rtrvGrpAdminRequest"/>
+			<wsdl:output message="tns:rtrvGrpAdminResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGrpBenefitPkg">
+			<wsdl:input message="tns:rtrvGrpBenefitPkgRequest"/>
+			<wsdl:output message="tns:rtrvGrpBenefitPkgResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="GroupBinding" type="tns:GroupService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="rtrvGrpDetail">
+			<soap:operation soapAction="urn:group1_0.service.cs.bcbsm.com/rtrvGrpDetail"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getGrpWelInfo">
+			<soap:operation soapAction="urn:group1_0.service.cs.bcbsm.com/getGrpWelInfo"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGroupCust">
+			<soap:operation soapAction="urn:group1_0.service.cs.bcbsm.com/rtrvGroupCust"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGrpList">
+			<soap:operation soapAction="urn:group1_0.service.cs.bcbsm.com/rtrvGrpList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGrpUser">
+			<soap:operation soapAction="urn:group1_0.service.cs.bcbsm.com/rtrvGrpUser"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGrpAdmin">
+			<soap:operation soapAction="urn:group1_0.service.cs.bcbsm.com/rtrvGrpAdmin"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="rtrvGrpBenefitPkg">
+			<soap:operation soapAction="urn:group1_0.service.cs.bcbsm.com/rtrvGrpBenefitPkg"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="Group">
+		<wsdl:port binding="tns:GroupBinding" name="GroupPort">
+			<soap:address location="http://localhost:9080/GroupWeb/services/GroupPort"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

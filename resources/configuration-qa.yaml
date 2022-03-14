@@ -1,0 +1,45 @@
+# *** API Listener Configurations ***
+api:
+  host: "0.0.0.0"
+  path: "/v1.0/*"
+  autodiscoveryId: "11111111"
+  name: "bpgetmembership"
+  timeout: "30000"
+  
+https:
+  private:
+    port: "8092"                                                                               
+                                                                                                                   
+# *** Library Configurations *** 
+security:
+  username : "simschqa"
+  
+bpldsmembershipInfo:
+  host: "qa-dlb-api2api.bcbsm.com"
+  port: "443"
+  basePath: "/qa-api2api/bpldsmembershipinfo-bcbsm/v1.0"
+  resource: "/contractRoster"
+  clientId : "4c466c63f3e44132a8bdfe59cf11dfe7"
+  responseTimeOutMS : "30000"
+  
+wsc:
+  wsc_leh: 
+    address: "https://servicestierdp1qa.bcbsm.com:61003/Elig/LocateEligHist/2.1"
+    operation: LocateHistories
+    port: LocateEligHistPort
+    service: LocateEligHist
+    wsdlLocation: "wsdl/LocateEligHist.wsdl"
+    timeout: "30000"
+  wsc_dce: 
+    address: "https://servicestierdp1qa.bcbsm.com:61003/Elig/DeterEligibility/2.0"
+    operation: GetEligbility
+    port: DeterEligibilityPort
+    service: DeterEligibility
+    wsdlLocation: "wsdl/DeterEligibility.wsdl"
+    timeout: "30000"
+  
+insecure : "false"  
+trustStorePath: "qa_dlb_api2api.bcbsm.com.p12"
+successCodeValidator: "200,201,400,500,503,404"
+
+  

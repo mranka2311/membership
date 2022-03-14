@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd ">
+    
+      <flow name="bpgetmembership-main">
+        <http:listener config-ref="httpListenerConfig" path="${api.path}">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <flow-ref doc:name="bpgetmembership_initializeAPIAndLogConsumerUsage" doc:id="47529327-708f-4e2c-93a0-db38429ca5be" name="bpgetmembership_initializeAPIAndLogConsumerUsage"/>
+		<apikit:router config-ref="bp_getmembership-config" />
+		<error-handler ref="coreExceptionErrorHandler" />
+    </flow>
+    <flow name="post:\retrieve:application\json:bp_getmembership-config">
+    	<flow-ref doc:name="ldsMembership_mainLogic" doc:id="618bf66d-4999-4ed0-ae9f-407bea08952d" name="ldsMembership_mainLogic"/>
+    </flow>
+    <sub-flow name="bpgetmembership_initializeAPIAndLogConsumerUsage" doc:id="20927435-0dea-4a41-9799-1c50c9016707" >
+		<try doc:name="Try" doc:id="077c6778-d7ee-46bf-879f-3fefd7de3cec">
+			<ee:transform doc:name="initialize APIVariables" doc:id="70f6f003-518c-4605-94ba-7333535b9d41">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="marker"><![CDATA[%dw 2.0
+import module::globalfuncs
+output application/java
+---
+globalfuncs::getStandardAppName(app.name)]]></ee:set-variable>
+				<ee:set-variable variableName="originatingAppId"><![CDATA[%dw 2.0
+output application/java
+---
+if (attributes.headers['originating_appid'] != null)
+attributes.headers['originating_appid']
+else
+attributes.headers['client_id']]]></ee:set-variable>
+					<ee:set-variable variableName="headerCacheControl" ><![CDATA[%dw 2.0
+output application/java
+---
+attributes.headers['cache-control']]]></ee:set-variable>
+					<ee:set-variable variableName="messageId" ><![CDATA[%dw 2.0
+output application/java
+---
+if(payload.headerArea.messageId != null and payload.headerArea.messageId != "") payload.headerArea.messageId
+else correlationId
+]]></ee:set-variable>
+					<ee:set-variable variableName="originalPayload" ><![CDATA[%dw 2.0
+output application/json
+---
+if(isEmpty(payload) != true)
+payload
+else ""]]></ee:set-variable>
+					<ee:set-variable variableName="systemEnvironmentCode" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.headerArea.systemEnvironmentCode]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			<ee:transform doc:name="buildLogMessageConsumerUsage" doc:id="9182d732-458f-4ee5-9583-126c73b97a9d">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest"><![CDATA[%dw 2.0
+output application/json
+---
+{  
+	clientId: attributes.headers.client_id,
+	logLevel: "WARN",
+	messageId: vars.messageId default correlationId ,
+	name: app.name,
+	logPoint: "ConsumerUsage",
+	reason: "Message origination",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: null,
+	appErrCode: null,
+	sev: null,
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null	
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+			<flow-ref doc:name="CoreLogging_main" doc:id="a3908a4d-cee7-4961-876f-2e8f93eaa8e2" name="CoreLogging_main" target="coreLoggingResponse" />
+			<error-handler>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b327ebdf-dff5-4f8a-a0a5-a2e85cef6d6c">
+					<ee:transform doc:name="badRequestErrorMessage" doc:id="ea872fd4-bcff-4c53-85a2-ba60b1b9a459">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+import module::globalfuncs
+fun emptyToNull(element) = if(isEmpty(trim(element))) null else element
+var additionalInfo = if (emptyToNull(vars.errorEntry.inputAdditionalInfo) != null) vars.errorEntry.inputAdditionalInfo else if (emptyToNull(vars.errorEntry.additionalInfo) != null) vars.errorEntry.additionalInfo else error.description default null
+
+output application/json
+---
+{
+	messageId: "",
+	systemEnvironmentCode: "",
+	systemMessage: [{
+		source: globalfuncs::getStandardAppName(app.name),
+		code: "INV",
+		subCode: "APIKIT:BAD_REQUEST",
+		additionalInfo: additionalInfo
+	}]
+}]]></ee:set-payload>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+---
+400]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<ee:transform doc:name="buildLogMessageBadRequestError" doc:id="9e6ef1ec-7b35-4294-9f1d-553be1e4694c">
+						<ee:message />
+						<ee:variables>
+							<ee:set-variable variableName="coreLoggingLogMessageRequest"><![CDATA[%dw 2.0
+output application/json
+---
+{  
+	clientId: attributes.headers.client_id,
+	logLevel: "ERROR",
+	messageId: vars.messageId default correlationId ,
+	name: app.name,
+	logPoint: "InitializationBeforeAPIkitError",
+	reason: "Bad request or Malformed request or Mule expression",
+	category: "exception",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: null,
+	appErrCode: null,
+	sev: null,
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null	
+}]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="CoreLogging_main" doc:id="324e5acf-6ff2-4865-ad36-4f59544c7d74" name="CoreLogging_main" target="coreLoggingResponse" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+</mule>

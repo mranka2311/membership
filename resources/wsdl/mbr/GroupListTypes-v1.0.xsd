@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns:grp="urn:group1_0.mbr.schema.bcbsm.com" xmlns:tns="urn:grplist1_0.mbr.schema.bcbsm.com" xmlns:meta="urn:meta1_1.schema.bcbsm.com" xmlns:mbr="urn:mbr2_1.schema.bcbsm.com" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:grplist1_0.mbr.schema.bcbsm.com" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0.1">
+	<!--
+	=================== Change Log ===================
+		Version		: 1.0.1
+		Date		: 04/16/2018
+		Details		: Added ParentType to RtrvGrpListRequest
+					  Added AgentID, SponsorID, ManagingAgentID to CompanyType 
+					  Added Address, LastUpdatedDate to the GrpInfoType in RtrvGrpList Response.
+	
+		Version		: 1.0.0
+		Date		: 10/12/2017
+		Details		: Added new operation RtrvGrpList and corresponding Request and Response Payload elements.
+	
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+	<import namespace="urn:group1_0.mbr.schema.bcbsm.com" schemaLocation="GroupTypes-v1.0.xsd"/>
+	<element name="RtrvGrpListRequest">
+		<annotation>
+			<documentation>Request for RtrvGrpList</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:RtrvGrpListReqPayloadType">
+							<annotation>
+								<documentation>Payload for Retrieve Group List Request.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="RtrvGrpListResponse">
+		<annotation>
+			<documentation>Response for RtrvGrpList</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:RtrvGrpListRespPayloadType" minOccurs="0">
+							<annotation>
+								<documentation>Payload for Retrieve Group Detail Response.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<complexType name="RtrvGrpListReqPayloadType">
+		<annotation>
+			<documentation>High level group information.</documentation>
+		</annotation>
+		<sequence>
+			<choice>
+				<element name="LogonId" type="string">
+					<annotation>
+						<documentation>The Mainframe logon id associated with Group/Agent</documentation>
+					</annotation>
+				</element>
+				<element name="GroupId" type="string">
+					<annotation>
+						<documentation>Id of Group</documentation>
+					</annotation>
+				</element>
+			</choice>
+			<element name="BusinessChannel" type="common:BusinessChannelType" minOccurs="0">
+				<annotation>
+					<documentation>Possible values BCN, LOCAL, NASCO.  Until implementation is available to lookup this value based upon group, this field would be required.</documentation>
+				</annotation>
+			</element>
+			<element name="RtrvGrpDetails" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Retrieve group and company details from SMART database if Yes. Default is No. If Yes then BusinessChannel is required field. </documentation>
+				</annotation>
+			</element>
+			<element name="ServLinePagination" type="tns:ReqPaginationType" minOccurs="0">
+				<annotation>
+					<documentation>Pagination to allow the consumers to select the page number and the number of records/groups per page. Max records allowed per page is 3000.</documentation>
+				</annotation>
+			</element>
+			<element name="ParentType" type="string">
+				<annotation>
+					<documentation>Parent ID for a User. Default value is blank and possible Values are AGENT or MA or SPONSOR.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="RtrvGrpListRespPayloadType">
+		<annotation>
+			<documentation>List of groups rolled up by Company.</documentation>
+		</annotation>
+		<sequence>
+			<element name="ServLinePagination" type="tns:RespPaginationType" minOccurs="0">
+				<annotation>
+					<documentation>Pagination information to return the Page Number, No. of records/groups per page and Total number of pages, records available. </documentation>
+				</annotation>
+			</element>
+			<element name="Company" type="tns:CompanyType" minOccurs="0" maxOccurs="25000">
+				<annotation>
+					<documentation>Company to which group is associated with</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="CompanyType">
+		<complexContent>
+			<extension base="grp:CompanyType">
+				<sequence>
+					<element name="AgentID" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Agent ID</documentation>
+						</annotation>
+					</element>
+					<element name="SponsorID" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Sponsor ID</documentation>
+						</annotation>
+					</element>
+					<element name="ManagingAgentID" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Managing Agent ID</documentation>
+						</annotation>
+					</element>
+					<element name="Group" type="tns:GrpInfoType" minOccurs="0" maxOccurs="25000"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GrpInfoType">
+		<complexContent>
+			<extension base="grp:GrpInfoType">
+				<sequence>
+					<element name="LastUpdatedDate" type="dateTime" minOccurs="0">
+						<annotation>
+							<documentation>Date Assigned or the Last Updated Date. </documentation>
+						</annotation>
+					</element>
+					<element name="Address" type="grp:AddressType" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ReqPaginationType">
+		<annotation>
+			<documentation> This is used for large messages where response is broken down into multiple responses. Max records allowed per page is 3000.</documentation>
+		</annotation>
+		<sequence>
+			<element name="PageID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Page number to be passed by the consumer.</documentation>
+				</annotation>
+			</element>
+			<element name="TotalRecordsPerPage" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Total number of records/groups to be returned in a single page or response.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="RespPaginationType">
+		<annotation>
+			<documentation>Page number returned in the response.</documentation>
+		</annotation>
+		<sequence>
+			<element name="PageID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Actual page number returned in the response.</documentation>
+				</annotation>
+			</element>
+			<element name="TotalRecordsPerPage" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Total number of records/groups returned in the response.</documentation>
+				</annotation>
+			</element>
+			<element name="MaxRecordsAvailable" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Maximum number of records/groups available.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+</schema>

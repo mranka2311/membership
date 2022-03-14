@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions targetNamespace="urn:locateelig2_1.service.cs.bcbsm.com" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:svc="urn:locateelig2_1.elig.schema.bcbsm.com" xmlns:tns="urn:locateelig2_1.service.cs.bcbsm.com" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<types>
+		<xs:schema>
+			<xs:import namespace="urn:locateelig2_1.elig.schema.bcbsm.com" schemaLocation="elig/LocateEligibility-v2.1.xsd"/>
+		</xs:schema>
+	</types>
+	<message name="LocateEligibilityHistoryRequest">
+		<part element="svc:LocateEligHistRequest" name="request"/>
+	</message>
+	<message name="LocateEligibilityHistoryResponse">
+		<part element="svc:LocateEligHistResponse" name="response"/>
+	</message>
+	<portType name="LocateEligHistService">
+		<operation name="LocateHistories" parameterOrder="request">
+			<input message="tns:LocateEligibilityHistoryRequest" name="locateEligibilityHistoryRequest"/>
+			<output message="tns:LocateEligibilityHistoryResponse" name="locateEligibilityHistoryResponse"/>
+		</operation>
+	</portType>
+	<binding name="LocateEligHistBinding" type="tns:LocateEligHistService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="LocateHistories">
+			<soap:operation soapAction="urn:locateelighist1_1.service.cs.bcbsm.com/locateHistories"/>
+			<input name="locateEligibilityHistoryRequest">
+				<soap:body use="literal"/>
+			</input>
+			<output name="locateEligibilityHistoryResponse">
+				<soap:body use="literal"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="LocateEligHist">
+		<port binding="tns:LocateEligHistBinding" name="LocateEligHistPort">
+			<soap:address location="http://localhost:9081/LocateEligHistWeb/services/LocateEligHistPort"/>
+		</port>
+	</service>
+</definitions>

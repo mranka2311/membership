@@ -1,0 +1,494 @@
+#%RAML 1.0 Library
+
+types:
+  payloadAreaType:
+    type: object
+    properties:
+      personPayload?:
+        type: object
+        properties:
+          personInfo?:
+            type: array
+            items:
+              type: personInfoType
+          lehPayload?:
+            type: array
+            items:
+              type: lehPayloadType
+  
+
+  lehPayloadType:
+    type: object
+    properties:
+      contractExistIndicator?: string
+      contractActiveIndicator?: string
+      memberFoundIndicator?: string
+      memberActiveIndicator?: string
+      multipleMembersFoundIndicator?: string
+      subscriberMismatch?: string
+      eligibilityHistory?: 
+        type: array
+        items:
+          type: eligibilityHistoryType
+      dcePayload?:
+        type: array
+        items:
+          type: dcePayloadType
+  dcePayloadType:
+    type: object
+    properties:
+      contractExistIndicator?: string
+      contractActiveIndicator?: string
+      lastEligible?:
+        type: object
+        properties:
+          effectiveDate?: date-only
+          expirationDate?: date-only
+      maxMemberMatchRating?: string
+      memberFoundIndicator?: string
+      memberActiveIndicator?: string
+      multipleMembersFoundIndicator?: string
+      subscriberDemographics?: 
+        type: array
+        items:
+          type: subscriberDemographicsType
+      memberDemographics?:
+        type: array
+        items:
+          type: memberDemographicsType
+      
+      agentID?: string
+  
+  
+  
+  relationDescriptionType:
+    type: object
+    properties:
+      normRelCode?: string
+      value?: string
+
+  memberDemographicsType:
+    type: object
+    properties:
+      eid?: string
+      memberId?: string
+      personInfo:
+        type: object
+        properties:
+          name: nameType
+          dateOfBirth?: date-only
+          genderIndicator?: string
+      relationshipCode?: string
+      phone?:
+        type: object
+        properties:
+          areaCode?: string
+          exchange?: string
+          number?: string
+          extension?: string
+      alternateAddress?:
+        type: object
+        properties:
+          street?: string[]
+          city?: string
+          county?: string
+          stateProvince?: string
+          postalCode?: string
+          country?: string
+
+      address?: 
+        type: object
+        properties:
+          street?: string[]
+          city?: string
+          county?: string
+          stateProvince?: string
+          postalCode?: string
+          country?: string
+      memberStatus?: string
+      memberPrivacyIndicator?: string
+      memberMatchRating?: string
+      memberBenefitLevel?: string
+      membersTier?: string
+      memberActiveDates?:
+        type: array
+        items:
+          type: memberActiveDatesType
+      memberMedicareIndicator?:
+        type: object
+        properties:
+          medicareAIndicator?: string
+          medicareAexpEffDate?: date-only
+          medicareAexpExpDate?: date-only
+          medicareBIndicator?: string
+          medicareBexpEffDate?: date-only
+          medicareBexpExpDate?: date-only
+      medicareHIBNumber?: string
+      maContractIndicator?: string
+      cdhIndicator?: string
+      facAdmissionVerif?: string
+      profAdmissionVerif?: string
+      qualifier?:
+        type: array
+        items:
+          properties:
+            code?: string
+            effDate?: date-only
+            expDate?: date-only
+      comment?:
+        type: array
+        items:
+          properties:
+            type?: string
+            desc?: string
+      employeeStatus?: string
+      custodialParent?:
+        type: object
+        properties:
+          effDate?: date-only
+          expDate?: date-only
+          name?: nameType
+          address?: 
+            type: object
+            properties:
+                street?: string[]
+                city?: string
+                county?: string
+                stateProvince?: string
+                postalCode?: string
+                country?: string 
+      alternateInfo?:
+        type: object
+        properties:
+          protectedHealthcareInfoInd?: string
+          effDate?: date-only
+          expDate?: date-only
+          name?:
+            type: object
+            properties:
+                first?: string
+                last?: string
+                middle?: string
+                suffix?: string
+          address?: 
+            type: object
+            properties:
+                street?: string[]
+                city?: string
+                county?: string
+                stateProvince?: string
+                postalCode?: string
+                country?: string
+          phone?:
+            type: object
+            properties:
+              areaCode?: string
+              exchange?: string
+              number?: string
+              extension?: string
+      authorizedRepEffDate?: date-only
+      authorizedRepExpDate?: date-only    
+      authorizedRepDesignation?: string
+      personRepEffDate?: date-only
+      personRepExpfDate?: date-only
+      personRepDesignation?: string
+      employeePayCode?: string
+      groupInfo?:
+        type: object
+        properties:
+          number?: string
+          suffix?: string
+          name?: string
+          contractNumber?: string
+          contractAlphaPrefix?: string
+          contractExtent?: string
+          rawExtent?: string
+          productIndicator?: string
+          productCode?: string
+          productDescription?: string
+          productEffectiveDays?: string
+          maaContract?: string
+          maCoverageCategory?: string
+          maProductInd?: string
+          subHomePlan?: string
+          subPlanCd?: string
+          subHomeSystem?: string
+          package?: string
+          benefitKey?:
+            type: object
+            properties:
+              commonKey?: string
+              crossKey?: string
+              shieldKey?: string
+              benefitString?: string
+              benefitPackageInd?: string
+          contractActiveDates?:
+            type: array
+            items:
+              type: contractActiveDatesType
+          insuranceType?: string
+          insuranceCode?: string
+          autoNationalInd?: string
+          sourceName?: string
+          contractPrivacyInd?: string
+          aptcInd?: string
+          delinquencyInd?: string
+          productId?: string
+          subProductId?: string
+          limitString?: string
+          pcpName?: nameType
+          memberPcpPin?: string
+          memberPcpNpi?: string
+          memberPcpgNpi?: string
+          deptNbr?: string
+          policyType?: string
+      oclInd?: string
+      cobInd?: string
+      contractPrimacyInd?: string
+      billType?: string
+      medicareBNotRegisteredInd?: string
+      hireDate?: date-only
+      originalEffDate?: string
+      memClassId?: string
+
+
+                
+                   
+
+
+
+
+          
+
+
+
+
+
+          
+
+
+
+
+
+
+
+
+
+
+
+  contractActiveDatesType:
+    type: object
+    properties:
+      effDate?: date-only
+      expDate?: date-only
+      effectiveCode?: string
+      paidToDate?: string
+      graceCode?: string
+      gracePeriod?: string
+
+  memberActiveDatesType:
+    type: object
+    properties:
+      effectiveDate?: date-only
+      expirationDate?: date-only
+      effectiveCode?: string
+      paidToDates?: string
+      graceCode?: string
+      gracePeriod?: string
+      productEffectiveDate?: string
+      enrollmentCode?: string
+      preExistingWaitingPeriodDate?: string
+      benefitWaitingPeriodDate?: string
+      lobIndicator?:
+        type: array
+        items:
+          properties:
+            systemCode?: string
+            productClass?: string
+            productDescription?: string
+            value?: string
+      itsBenefitKey?:
+        type: object
+        properties:
+          commonKey?: string
+          crossKey?: string
+          shieldKey?: string
+          benefitKey?: string
+          benefitPackageId?: string
+      secondaryGroupNumber?: string
+
+
+
+
+  subscriberDemographicsType:
+    type: object
+    properties:
+      name: nameType
+      dateOfBirth?: date-only
+      genderIndicator?: string
+      subscriberAddress?:   
+        type: object
+        properties:
+          street?: string[]
+          city?: string
+          stateProvince?: string
+          postalCode?: string
+      badAddressInd?: string
+      subscriberPhone?:
+        type: object
+        properties:
+          areaCode?: string
+          exchange?: string
+          number?: string
+          extension?: string
+
+      subscriberMismatch?: string 
+      billLevel?: string
+      employerReferenceId?: string
+  eligibilityHistoryType:
+    type: object
+    properties:
+      effectiveDate?: date-only
+      expirationDate?: date-only
+      group?:
+        type: object
+        properties:
+          groupNumber?: string
+          groupSuffix?: string
+      subscriberName?: nameType
+      member?:
+        type: object
+        properties:
+          sequenceNumber?: string
+          dateOfBirth?: string
+          genderIndicator?: string
+          relationshipCode?: string
+          name?: nameType
+      memberMatchRating?:
+      source?: string
+      contract?: 
+        type: object
+        properties:
+          contractNumber?: string
+          alphaPrefix?: string
+          extent?: string
+
+  groupType:
+    type: object
+    properties:
+      number?: string
+      suffix?: string
+      contract?:
+        type: object
+        properties:
+          number?: string
+          alphaPrefix?: string
+          extent?: string
+          subscriber?:
+            type: object
+            properties:
+              ssn?: string
+          idCardNum?: string
+          memberId?: string
+          relationshipCode?: string
+          activeCoverageInd?: string
+          coveragePeriod:
+            type: object
+            properties:
+              effectiveDate?: date-only
+              expirationDate?: date-only
+          privacyInd?: string
+
+  emailType:
+    type: object
+    properties:
+      location?: string
+      optOut?: string
+      value?: string
+
+  phoneType:
+    type: object
+    properties:
+      location?: string
+      optOut?: string
+      value?: string
+
+  addressType:
+    type: object
+    properties:
+      location?: string
+      optOut?: string
+      street?: string[]
+      city?: string
+      county?: string
+      stateProvince?: string
+      postalCode?: string
+      country?: string
+      postalAddOnCode?: string
+      routingCode?: string
+      
+  personType:
+    type: object
+    properties:
+      businessChannel?: string
+      perSrcId?: string
+      perEid?: string
+      prefix?: string
+      first?: string
+      last?: string
+      middle?: string
+      suffix?: string
+      fullName?: string
+      medicaidId?: string
+      medicaidStateCode?: string
+      dateOfBirth?: string
+      dateOfdeath?: string
+      deceasedInd?: string
+      ssn?: string
+      genderIndicator?:  string
+      address?:
+        type: array
+        items:
+          type: addressType
+      phone?:
+        type: array
+        items:
+          type: phoneType
+      email?:
+        type: array
+        items:
+          type: emailType
+      membership?:
+        type: object
+        properties:
+          group?:
+            type: array
+            items:
+              type: groupType
+          wcmInd?: string
+          medicare?:
+            type: object
+            properties:
+              hib?: string
+              hicn?: string
+        
+  nameType:
+    type: object
+    properties:
+      first?: string
+      last?: string
+      middle?: string
+      suffix?: string
+      prefix?: string
+  personInfoType:
+    type: object
+    properties:
+      eid?: string
+      matchScore?: string
+      rawScore?: string
+      bestRecordInd?: string
+      person:
+        type: array
+        items:
+          type: personType
+      

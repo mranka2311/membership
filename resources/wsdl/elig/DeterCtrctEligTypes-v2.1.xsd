@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:deterctrctelig2_1.elig.schema.bcbsm.com" xmlns:tns="urn:deterctrctelig2_1.elig.schema.bcbsm.com" xmlns:meta="urn:meta1_1.schema.bcbsm.com" xmlns:mbr="urn:mbr2_1.schema.bcbsm.com" xmlns:elig="urn:elig2_4.schema.bcbsm.com" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns:bnft="urn:bnft2_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.1.20">
+	<!--
+	=================== Change Log ===================
+		Version		: 2.1.20
+		Date		: 10/24/2018
+		Details		: Added EmployerReferenceId under SubscriberDemographics to DeterEligibilityRespPayloadType 
+		
+		Version		: 2.1.19
+		Date		: 02/05/2018
+		Details		: Changed Elig types to version 2.4.0 instead of 2.3.0
+		
+		Version		: 2.1.18
+		Date		: 01/03/2018 
+		Details		: Added InclMessaContracts field to DeterEligibilityReqPayloadType.
+	
+		Version		: 2.1.17
+		Date		: 01/06/2016 
+		Details		: Added UseCacheInd to DeterEligibilityReqPayloadType.
+				Added BadAddressInd to SubscriberInfoType.
+				Added AgentID to DeterEligibilityRespPayloadType.
+	
+		Version		: 2.1.16
+		Date		: 05/15/2015
+		Details		: Added PlanCode to DeterEligibilityReqPayloadType.
+		
+		Version		: 2.1.15
+		Date		: 04/06/2015
+		Details		: Added RBBInfoIndicator and RBBInformation to GroupSummaryType.
+		
+		Version		: 2.1.14
+		Date		: 02/02/2015
+		Details		: Added MemClassID to MemberDemographicsType.
+		
+		Version		: 2.1.13
+		Date		: 12/01/2014
+		Details		: Changed Elig types to version 2.3 instead of 2.2
+	
+		Version		: 2.1.12
+		Date		: 10/09/2014
+		Details		: Added ContractRANNumber elements to DeterEligibilityRespPayloadType.
+	
+		Version		: 2.1.11
+		Date		: 06/09/2014
+		Details		: Added HireDate and OriginalEffDate elements to MemberDemographicsType.
+					  Changed Elig types to version 2.2 instead of 2.1
+
+		Version		: 2.1.10
+		Date		: 05/16/2014
+		Details		: Added RawExtent element to GroupSummaryType as a string.
+		
+		Version		: 2.1.9
+		Date		: 04/23/2014
+		Details		: Added PolicyType element to GroupSummaryType as a string.
+		
+		Version		: 2.1.8
+		Date		: 01/21/2014
+		Details		: Added DeptNbr element to GroupSummaryType as a string.
+				Added Group to DeterEligibilityReqPayloadType as a mbr:GroupIdentifier type.
+				Changed Elig types to version 2.1 instead of 2.0
+		
+		Version		: 2.1.7
+		Date		: 08/14/2013
+		Details		: Added optional APTCIndicator, DelinquencyIndicator, ProductID and SubproductID elements to GroupSummaryType.
+				Added SSNDetermination and RemoveDuplicates in request.
+				Added ProductIndicator, ProductCode, ProductDescription, ProductEffectiveDays, ContractPrimacyIndicator to the GroupInfo.
+				Added annotation to OCLIndicator, COBIndicator and BillType to the GroupInfo.
+				Added MemberPCPPIN”, “MemberPCPNPI”, “MemberPCPGNPI” to the GroupInfo.
+
+		Version		: 2.1.6
+		Date		: 09/13/2011
+		Details		: Added optional PCPName (Primary Care Physician) element to GroupSummaryType. 
+				Added EmployeePayCode to MemberDemographics
+				Updated MemberSequenceIdentifier in MbrTypes-v2.1.xsd.  This impacts the MemberDemographicsType.
+				Added BillType to MemberDemographics to eventually move the SubscriberDemographics BillLevel into MemeberDemographics.
+				
+		Version		: 2.1.5
+		Date		: 12/17/2010
+		Details		: Added OCLindicator, COBindicator which indicates whether to retrieve COB information.
+				Added InclNonactiveMbrCoverage
+
+		Version		: 2.1.4
+		Date		: 10/12/2010
+		Details		: Added field MemberMatchType.
+
+		Version		: 2.1.3
+		Date		: 07/28/2010
+		Details		: Defined MemberDemographicsType to handle the extension and limit nested classes.  No field structure was changed for this. 
+
+		Version		: 2.1.2
+		Date		: 05/01/2009
+		Details		: Added field 'SubscriberMismatch' into response side for SubscriberInfoType element 
+				'ESRDEffectiveDate' and 'ESRDExpirationDate' are already accounted for in EligTypes 2.0 QualifierType
+				Added field 'LimitString' into response side. for CAREN consumer
+
+		Version		: 2.1.1
+		Date		: 03/26/2009
+		Details		: Added field 'BillLevel' into Response under SubscriberDemographics for eEnrollment consumer to get SubscriberBillLevel from BCN only.
+				Added field 'BCBSMOnly' into request side. It is needed to exclude non-BCBSM contracts from NASCO results.
+
+		Version		: 2.1.0
+		Date		: 02/02/2009
+		Details		: ContractExistIndicator made required.
+				SubscriberPhone field made optional.
+				GroupSummaryType internalized identifier information to make Number optional.  FEP does not have this.
+				RosterOptionType.Indicator made required if RosterOption is present
+				Change ContractPrivacyIndicator from a String to a common:YesNoIndicatorEnum
+				Added optional MaxMemberMatchRating field to DeterEligibilityRespPayloadType
+				Added MAAltContract, MACoverageCategory, and MAProductIndicator to GroupSummaryType
+				Added InsuranceCode to GroupSummaryType
+				Imported Elig2.0 instead of Elig1.1 types
+
+		Version		: 2.0.1
+		Date		: 12/11/2008
+		Details		: Dependent changes to EligTypes Schema.
+				Also added LastEligible element to response
+
+		Version		: 2.0.0
+		Date		: 12/11/2008
+		Details		: Initial Version
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+	<import namespace="urn:bnft2_0.schema.bcbsm.com" schemaLocation="../bnft/BnftTypes-v2.0.xsd"/>
+	<import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="../mbr/MbrTypes-v2.1.xsd"/>
+	<import namespace="urn:elig2_4.schema.bcbsm.com" schemaLocation="EligTypes-v2.4.xsd"/>
+	<element name="DeterEligibilityRequest">
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:DeterEligibilityReqPayloadType">
+							<annotation>
+								<documentation>Is where the information that the message carries is provided</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="DeterEligibilityResponse">
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:DeterEligibilityRespPayloadType" minOccurs="0">
+							<annotation>
+								<documentation>Is where the information that the message carries is provided</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<complexType name="DeterEligibilityReqPayloadType">
+		<annotation>
+			<documentation>Request message for retrieving a BCBSM's contract eligibility</documentation>
+		</annotation>
+		<sequence>
+			<element name="BusinessChannel" type="common:BusinessChannelType" minOccurs="0"/>
+			<element name="Contract" type="mbr:ContractNumberType"/>
+			<element name="MemberInfoType" type="mbr:MemberInfoType" minOccurs="0"/>
+			<element name="EligibilityPeriod" type="common:DateRangeType" minOccurs="0">
+				<annotation>
+					<documentation>
+                        Date to check for contract eligibility.  The dates are considered inclusive to the response.
+                        If this element is not specified then the start and end dates will default to current.
+                        If the end date is not specified then it will be defaulted to the StartDate value.
+		                    </documentation>
+				</annotation>
+			</element>
+			<element name="LOBIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Whether LOB indicators should be returned 'Y' or 'N'</documentation>
+				</annotation>
+			</element>
+			<element name="LOBFilter" type="elig:LOBCodeEnum" minOccurs="0" maxOccurs="7">
+				<annotation>
+					<documentation>Filters based on LOB (F, P, V, H, D, X, etc.)</documentation>
+				</annotation>
+			</element>
+			<element name="BCBSMOnly" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Optional switch to indicate whether only BCBSM-managed contracts are returned. Possible values 'Y' or 'N'</documentation>
+				</annotation>
+			</element>
+			<element name="RosterOption" type="tns:RosterOptionType" minOccurs="0"/>
+			<element name="MemberMatchType" type="string" default="STATIC" minOccurs="0">
+				<annotation>
+					<documentation>This field decides the type of member match to use. Default value for this field is "STATIC" and other value it can take is "WEIGHTED". When value is STATIC, then members will be matched by strictly regimented algorithms on specific fields. When value is WEIGHTED, then algorithms will be applied to only the fields submitted in the request (and weighted appropriately) and not specific fields</documentation>
+				</annotation>
+			</element>
+			<element name="InclNonactiveMbrCoverage" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>If 'Y' then any members that exist within the contract coverage that applies to the request date will be returned.  If 'N' (default), then only the members with active coverages will be returned.  This applies only to non-member searches.</documentation>
+				</annotation>
+			</element>
+			<element name="SSNDetermination" type="common:YesNoIndicatorEnum" default="N" minOccurs="0">
+				<annotation>
+					<documentation>An indicator to know if Contract type, SSN or Random #, determination is expected. </documentation>
+				</annotation>
+			</element>
+			<element name="RemoveDuplicates" type="common:YesNoIndicatorEnum" default="Y" minOccurs="0">
+				<annotation>
+					<documentation>An indicator to identify if the Local and IKA duplicates need to be filtered. This is required when the consumer requires service keys for MA contracts. A value of 'Y' in this field denotes that no service keys will be furnished in response.</documentation>
+				</annotation>
+			</element>
+			<element name="Group" type="mbr:GroupIdentifier" minOccurs="0">
+				<annotation>
+					<documentation>AAllows further filtering of the response demographics on the group number or number/suffix combination provided.</documentation>
+				</annotation>
+			</element>
+			<element name="PlanCode" type="mbr:PlanCodeType" minOccurs="0">
+				<annotation>
+					<documentation>Subscriber's Plan Code. Mandatory for Service, If existing consumers not sending then DP will assign appropriate value.</documentation>
+				</annotation>
+			</element>
+			<element name="UseCacheInd" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Indicates whether the service response data can be sourced from the cache or freshly from the back end systems.</documentation>
+				</annotation>
+			</element>
+			<element name="InclMessaContracts" type="common:YesNoIndicatorEnum" minOccurs="0" default="N">
+				<annotation>
+					<documentation>If 'Y' then MESSA contracts normally excluded will now be included.  Value and behavior default to 'N'.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="DeterEligibilityRespPayloadType">
+		<annotation>
+			<documentation>Response message for presenting a BCBSM's contract eligibility</documentation>
+		</annotation>
+		<sequence>
+			<element name="ContractExistIndicator" type="common:YesNoIndicatorEnum">
+				<annotation>
+					<documentation>Indicates if the contract was found</documentation>
+				</annotation>
+			</element>
+			<element name="ContractActiveIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>For existing contracts will be set as true if the contract was enforced for any date that falls in the given date range of the request</documentation>
+				</annotation>
+			</element>
+			<element name="MemberFoundIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Used only for member eligibility requests, will be set to Y if member is found and N if member is not found.</documentation>
+				</annotation>
+			</element>
+			<element name="MemberActiveIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Used only for member eligibility requests, If the member was found for the contract will be set to true if the contract was enforced for the member for any date that falls in the given range of the request</documentation>
+				</annotation>
+			</element>
+			<element name="MaxMemberMatchRating" type="string" minOccurs="0">
+				<annotation>
+					<documentation>When member input criteria is provided, this field should provide a member match rating from 00 to 99 indicating how well the best member match.</documentation>
+				</annotation>
+			</element>
+			<element name="MultipleMembersFoundIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Used only for member eligibility requests, If the more than one member was found to match the member selection criteria then this would indicate such.</documentation>
+				</annotation>
+			</element>
+			<element name="LastEligible" type="common:ExpirableType" minOccurs="0"/>
+			<element name="RouteCode" type="string" minOccurs="0"/>
+			<element name="AgentID" type="string" minOccurs="0"/>
+			<element name="SubscriberDemographics" type="tns:SubscriberInfoType" minOccurs="0"/>
+			<element name="MemberDemographics" type="tns:MemberDemographicsType" minOccurs="0" maxOccurs="unbounded"/>
+			<element name="ContractRAN" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Used by the IVR. It needs to either be a Y/N flag that indicates if the Contract Number given as an input was a RAN or not (SSN). </documentation>
+				</annotation>
+			</element>
+			<element name="ContractRANNumber" type="string" minOccurs="0">
+				<annotation>
+					<documentation>This will hold the Contract RAN number and not a SSN even though consumer passes SSN in a request.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="MemberDemographicsType">
+		<complexContent>
+			<extension base="elig:MemberEligibilityInfoType">
+				<sequence>
+					<element name="EmployeePayCode" type="string" minOccurs="0"/>
+					<element name="GroupInfo" type="tns:GroupSummaryType"/>
+					<element name="OCLIndicator" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Other coverage liability indicator. </documentation>
+						</annotation>
+					</element>
+					<element name="COBIndicator" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Coordination of benefits indicator. </documentation>
+						</annotation>
+					</element>
+					<element name="ContractPrimacyIndicator" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Indicator as to the primary insurer on the contract. </documentation>
+						</annotation>
+					</element>
+					<element name="BillType" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Indicates the bill level or bill typeof the subscriber on the group.
+											Only present if the member is the subscriber.
+							</documentation>
+						</annotation>
+					</element>
+					<element name="MedicareBNotRegisteredIndicator" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Used by the IVR to indicate that the member is eligible for Medicare Part B, but has not signed up for it.</documentation>
+						</annotation>
+					</element>
+					<element name="HireDate" type="date" minOccurs="0">
+						<annotation>
+							<documentation>The subscribers date of employment.</documentation>
+						</annotation>
+					</element>
+					<element name="OriginalEffDate" type="date" minOccurs="0">
+						<annotation>
+							<documentation>The date on which the subscriber first received coverage.</documentation>
+						</annotation>
+					</element>
+					<element name="MemClassID" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Subgroup identification number.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GroupSummaryType">
+		<annotation>
+			<documentation>Does not extend GroupType in member because some systems do not return a group number (FEP).</documentation>
+		</annotation>
+		<sequence>
+			<element name="Number" minOccurs="0">
+				<annotation>
+					<documentation>
+						Group Number the Contract is associated with
+					</documentation>
+				</annotation>
+				<simpleType>
+					<restriction base="string">
+						<minLength value="5"/>
+						<maxLength value="9"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="Suffix" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Group suffix number the contract is associated
+						with. For NASCO this is equivalent section
+						number. BCN side it is SubGroup and service side
+						we map this with Suffix.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="Name" type="string" minOccurs="0"/>
+			<element name="Contract" type="mbr:ContractNumberType"/>
+			<element name="RawExtent" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						New NASCO Extent field to communicate the extent for non-standard contracts - such as flex link.
+						We are doing this as the risk surrounding properly indicating the extent in the contract field is too high to introduce to the entire enterprise at one time.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="ProductIndicator" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Product Indicator for MOS groups.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="ProductCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>ProductCode</documentation>
+				</annotation>
+			</element>
+			<element name="ProductDescription" type="string" minOccurs="0">
+				<annotation>
+					<documentation>ProductDescription</documentation>
+				</annotation>
+			</element>
+			<element name="ProductEffectiveDays" type="string" minOccurs="0">
+				<annotation>
+					<documentation>ProductEffectiveDays</documentation>
+				</annotation>
+			</element>
+			<element name="MAAltContract" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Alternate contract number for the MA business tracking.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="MACoverageCategory" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Value from the LOCAL systems that describes the MA coverage type in text.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="MAProductIndicator" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Value from the LOCAL systems that describes the MA product type by 1 char code.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="SubHomePlan" type="string" minOccurs="0">
+				<annotation>
+					<documentation>NASCO only</documentation>
+				</annotation>
+			</element>
+			<element name="SubPlanCd" type="string" minOccurs="0">
+				<annotation>
+					<documentation>NASCO only</documentation>
+				</annotation>
+			</element>
+			<element name="SubHomeSystem" type="string" minOccurs="0">
+				<annotation>
+					<documentation>NASCO only</documentation>
+				</annotation>
+			</element>
+			<element name="Package" type="string" minOccurs="0">
+				<annotation>
+					<documentation>NASCO only</documentation>
+				</annotation>
+			</element>
+			<element name="BenefitKey" type="bnft:BenefitKeyType" minOccurs="0"/>
+			<element name="ContractActiveDates" type="elig:ActiveDatesType" maxOccurs="unbounded"/>
+			<element name="InsuranceType" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Traditional / PPO / HMO / POS / etc.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="InsuranceCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						The code used in determining policy/insurance type.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="AutoNationalIndicator" type="string" minOccurs="0"/>
+			<element name="SourceName" type="string">
+				<annotation>
+					<documentation>
+						System of Contract - BCN, LOCAL, NASCO, FEP
+					</documentation>
+				</annotation>
+			</element>
+			<element name="ContractPrivacyIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>
+						Y or N depending on whether the source system indicates there is a privacy condition that applies to this entire contract.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="APTCIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>
+						NASCO only, Y or N depending on whether the source system indicates there is a premium subsidy present or not.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="DelinquencyIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>
+						Y or N depending on if the service determines the &quot;paid to date&quot; is before the system date and APTCIndicator set to Y or N.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="ProductID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						NASCO Only. Identifies the productID B, S, G or P
+					</documentation>
+				</annotation>
+			</element>
+			<element name="SubProductID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						NASCO Only. Identifies the subproductID 1, 2, 3, 4, 5 or 6
+					</documentation>
+				</annotation>
+			</element>
+			<element name="LimitString" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						NASCO Only. Identifies the eligibility limit and modifications for the contract
+					</documentation>
+				</annotation>
+			</element>
+			<element name="PCPName" type="common:NameType" minOccurs="0">
+				<annotation>
+					<documentation>
+						Primary Care Physician name.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="MemberPCPPIN" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Member's selected Primary care physician PIN
+					</documentation>
+				</annotation>
+			</element>
+			<element name="MemberPCPNPI" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Member's selected Primari care physician NPI
+					</documentation>
+				</annotation>
+			</element>
+			<element name="MemberPCPGNPI" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Primary Care Physician's Group NPI / billing code (BCN only )
+					</documentation>
+				</annotation>
+			</element>
+			<element name="DeptNbr" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Department Number for groups for which subdivisions are necessary (e.g. - FORD, etc.) (NASCO only )
+					</documentation>
+				</annotation>
+			</element>
+			<element name="PolicyType" type="string" minOccurs="0">
+				<annotation>
+					<documentation>
+						Subscriber Type of Contract (NASCO only)
+					</documentation>
+				</annotation>
+			</element>
+			<element name="RBBInfoIndicator" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>
+						Y or N depending on whether the RBB information present or not.
+					</documentation>
+				</annotation>
+			</element>
+			<element name="RBBInformation" type="tns:RBBInfoType" minOccurs="0">
+				<annotation>
+					<documentation>
+						RBB (Reference based benefits) information present on the group.
+					</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="RosterOptionType">
+		<all>
+			<element name="Indicator" type="common:YesNoIndicatorEnum">
+				<annotation>
+					<documentation>Indicates whether a roster is being requested in the response or not.</documentation>
+				</annotation>
+			</element>
+			<element name="MemberID" type="mbr:MemberSequenceIdentifier" minOccurs="0">
+				<annotation>
+					<documentation>Specify only if the specific member is needed from a roster list</documentation>
+				</annotation>
+			</element>
+		</all>
+	</complexType>
+	<complexType name="SubscriberInfoType">
+		<complexContent>
+			<extension base="common:PersonalInfoType">
+				<sequence>
+					<element name="SubscriberAddress" type="common:AddressType"/>
+					<element name="BadAddressInd" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+					<element name="SubscriberPhone" type="common:PhoneNumberDetailedType" minOccurs="0"/>
+					<element name="BillLevel" type="string" minOccurs="0">
+						<annotation>
+							<documentation>**Deprecated - Use MemberDemographics.BillType.</documentation>
+						</annotation>
+					</element>
+					<element name="SubscriberMismatch" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+					<element name="EmployerReferenceId" type="string" minOccurs="0" maxOccurs="1">
+						<annotation>
+							<documentation>EmployerReferenceId</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="RBBInfoType">
+		<complexContent>
+			<extension base="common:DateRangeType">
+				<sequence>
+					<element name="ProductType" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Contains product type value from NASCO RBB GENO table.</documentation>
+						</annotation>
+					</element>
+					<element name="TreatmentString" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Value of RBB Services purchased.</documentation>
+						</annotation>
+					</element>
+					<element name="OutOfPocketIndicator" type="string" minOccurs="0">
+						<annotation>
+							<documentation>This flag indicates whether or not the RBB excess is applied toward out-of-pocket.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

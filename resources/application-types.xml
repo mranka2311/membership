@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="sql" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+    <types:type name="json" format="java">
+      <types:shape format="raml"><![CDATA[#%RAML 1.0 DataType
+type: string]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#d13fcdb2-8d49-47ee-9f78-273de530e868"/>
+  <types:enrichment select="#98680655-d91e-4db1-be76-334552455780"/>
+  <types:enrichment select="#0f3cf779-fd00-4ab7-b226-0c0a4faffa61"/>
+  <types:enrichment select="#38ba5cdc-a8bc-41f2-8771-fcee213c5f02"/>
+  <types:enrichment select="#51e4eda0-ae0f-46cc-a018-ce1da3a31973"/>
+  <types:enrichment select="#81d82bf5-9a96-46e9-ba62-286ae7f11cd3"/>
+  <types:enrichment select="#d870d707-58cb-44a5-8659-ce7f4ff4031a"/>
+  <types:enrichment select="#c02dad92-8899-4e0b-b63f-e0f2e5fc613a"/>
+  <types:enrichment select="#704e2565-9164-4ac8-bc50-d5371645c4bb"/>
+  <types:enrichment select="#4026394b-39a4-45fe-aa23-c517b6151a5a"/>
+  <types:enrichment select="#861c0ab6-9e67-46de-bcc8-25607f9e2e54"/>
+  <types:enrichment select="#598808bd-6df8-4294-9917-d6e57e561b82"/>
+  <types:enrichment select="#f8cf3724-28b8-4c2b-b91d-7d9ad6fff862"/>
+  <types:enrichment select="#259c6f14-5ce2-46d5-9034-dd76e1494355"/>
+  <types:enrichment select="#d0926f25-de5e-4080-bad1-d6b5be27c4b9"/>
+  <types:enrichment select="#70f6f003-518c-4605-94ba-7333535b9d41"/>
+  <types:enrichment select="#8c29c6d7-60c0-4861-b3d3-609bd7ff14bb"/>
+  <types:enrichment select="#64065da8-2942-4183-9134-ff035f78fbfc"/>
+  <types:enrichment select="#38f77d5c-2d63-4226-a8eb-9f01141bb17d"/>
+  <types:enrichment select="#0938d0ec-60d8-482d-a8ce-878dee993410"/>
+  <types:enrichment select="#23797240-339c-48d7-860b-38e672d6d5f6"/>
+  <types:enrichment select="#0c752220-fec7-433a-862b-1a5b6a0e698f"/>
+  <types:enrichment select="#a771e86a-e25f-4fd4-b3d8-8bea23a5b309"/>
+  <types:enrichment select="#dd982829-8d81-417e-9a6c-1753ba8a421f"/>
+  <types:enrichment select="#7efccf03-53b9-4e91-b11f-531d4c30cc97"/>
+  <types:enrichment select="#96d89659-ecdb-424d-b80f-8e06f6d68582"/>
+  <types:enrichment select="#199665c8-c85b-4f7d-9af1-2f26f76e082a"/>
+</types:mule>

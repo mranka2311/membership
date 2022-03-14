@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:common="urn:common2_0.schema.bcbsm.com"
+        xmlns:mbr="urn:mbr2_1.schema.bcbsm.com"
+        xmlns:meta="urn:meta1_1.schema.bcbsm.com"
+        xmlns:tns="urn:rtrvalphaprefix2_0.elig.schema.bcbsm.com"
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified"
+        targetNamespace="urn:rtrvalphaprefix2_0.elig.schema.bcbsm.com"
+        version="2.0">
+        
+    <import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+    <import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+    <import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="../mbr/MbrTypes-v2.1.xsd"/>
+
+<!--
+    =================== Change Log ===================
+
+        Version : 2.0.0
+        Date    : 02/04/2010
+        Details : Incorporated common schemas
+                  Merged request and response schemas into this type schema.
+        
+        Version : 1.0.0
+        Date    : 06/30/2007
+        Details : Initial release
+-->
+    
+    <complexType name="RtrvAlphaPrefixReqPayloadType">
+        <annotation>
+            <documentation>Request message criteria for retrieving a BCBSM's contract alpha prefix</documentation>
+        </annotation>
+        <sequence>
+            <element name="Contract" type="mbr:ContractIdentifier">
+                <annotation>
+                    <documentation>The BCBSM contract id that will be used to look for an alpha prefix</documentation>
+                </annotation>
+            </element>
+            <element name="Group" type="mbr:GroupIdentifier" minOccurs="0">
+                <annotation>
+                    <documentation>The BCBM group suffix Number that could aid in the alpha prefix look up process</documentation>
+                </annotation>
+            </element>
+        </sequence>
+    </complexType>
+
+    <complexType name="RtrvAlphaPrefixRespPayloadType">
+        <sequence>
+            <element name="Contract" type="mbr:ContractNumberType">
+                <annotation>
+                    <documentation>The BCBSM contract id and alpha prefix that apply to the request criteria.</documentation>
+                </annotation>
+            </element>
+            <element name="Group" type="mbr:GroupIdentifier" minOccurs="0">
+                <annotation>
+                    <documentation>The BCBSM group number (and suffix) that was provided in the request.</documentation>
+                </annotation>
+            </element>
+        </sequence>
+    </complexType>
+
+    <element name="RtrvAlphaPrefixRequest">
+        <annotation>
+            <documentation>Retrieve Alpha Prefix Request Object</documentation>
+        </annotation>
+        <complexType>
+            <complexContent>
+                <extension base="meta:ReqMessageTemplateType">
+                    <sequence>
+                        <element name="PayloadArea" type="tns:RtrvAlphaPrefixReqPayloadType">
+                            <annotation>
+                                <documentation>The requested message input criteria container.</documentation>
+                            </annotation>
+                        </element>
+                    </sequence>
+                </extension>
+            </complexContent>
+        </complexType>
+    </element>
+    
+    <element name="RtrvAlphaPrefixResponse">
+        <annotation>
+            <documentation>Response Message for retrieving a BCBSM's contract alpha prefix</documentation>
+        </annotation>
+        <complexType>
+            <complexContent>
+                <extension base="meta:RespMessageTemplateType">
+                    <sequence>
+                        <element name="PayloadArea" type="tns:RtrvAlphaPrefixRespPayloadType" minOccurs="0">
+                            <annotation>
+                                <documentation>The container for the response information</documentation>
+                            </annotation>
+                        </element>
+                    </sequence>
+                </extension>
+            </complexContent>
+        </complexType>
+    </element>
+</schema>

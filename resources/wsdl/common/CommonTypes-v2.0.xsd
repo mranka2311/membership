@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="urn:common2_0.schema.bcbsm.com"
+	attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="urn:common2_0.schema.bcbsm.com"
+	version="2.0.3">
+<!--
+	=================== Change Log ===================
+		Version	: 2.0.3
+		Date		: 9/10/2010
+		Details		: PhoneNumber in ContactInfoType changed to a string.
+	
+		Version	: 2.0.2
+		Date		: 12/9/2008
+		Details		: Change the Code and Description to Code Description type to optional.
+				Phone Number Area code is optional
+				Change the Effective Date in Expirable Type to optional
+				DateOfBirth in PersonalInfoType to optional
+				Year in SegmentedDateType to optional
+	
+		Version	: 2.0.1
+		Date		: 9/11/2008
+		Details		: Added namespace alterations. 
+
+		Version	: 2.0
+		Date		: 8/19/2008
+		Details		: BusinessChannelEnum: removed restriction, renamed to BusinessChannelType. Adding MTV (Metavance) to enum. Removing MOS.
+				NameType: Added prefix. Updated MiddleName to Middle. 
+
+		Version	: 1.0
+		Date		: 4/25/2008
+		Details		: Initial version.
+-->
+	<complexType name="AddressType">
+		<sequence>
+			<element maxOccurs="3" minOccurs="0" name="Street" type="string"/>
+			<element minOccurs="0" name="City" type="string"/>
+			<element minOccurs="0" name="County" type="string"/>
+			<element minOccurs="0" name="StateProvince" type="string"/>
+			<element minOccurs="0" name="PostalCode" type="string"/>
+			<element minOccurs="0" name="Country" type="string"/>
+		</sequence>
+	</complexType>
+	<simpleType name="BooleanIndicatorEnum">
+		<restriction base="string">
+			<pattern value="[YNU]"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="BusinessChannelType">
+		<annotation>
+			<documentation>
+Possible values are: LOCAL, NPS, MTV, BCN, PGBA, MA, DENTEMAX
+Business channel is an abstract concept for backend system, which enables services to group backend systems in logical units. This is used by consumers to specify where to retrieve data from or where to change data. 
+Common interface systems identified in information layer [UC:SOAs] across services and service candidates. 
+If a service has multiple information layer components/UC: SOAs, business channel allows consumers to specify information layer channel. Most of the cases consumer already has this information before calling the service
+Usage: If service needs to accept multiple values for business channel e.g. getting data from both Local and Nasco then have definition with maxOccurs=n (n can be a predefined number or unbound)
+E.g. element name="BusinessChannel" type="common:BusinessChannelEnumEnum" minOccurs="0" maxOccurs="3"
+			</documentation>
+		</annotation>
+		<restriction base="string">
+			<minLength value="2"/>
+		</restriction>
+	</simpleType>
+	<complexType name="CodeDescriptionType">
+		<annotation>
+			<documentation>Informational element that is used to provide information about the state of the information retrieved, significant messages (info and error level) from the back-end systems, service level validation status, status  about relevant components of the service, etc</documentation>
+		</annotation>
+		<sequence>
+			<element minOccurs="0" name="Code" type="string">
+				<annotation>
+					<documentation>Code representation of the message </documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="Description" type="string">
+				<annotation>
+					<documentation>Descriptive represntation of the message</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ContactInfoDetailedType">
+		<sequence>
+			<element maxOccurs="unbounded" minOccurs="0" name="Address" type="tns:AddressType"/>
+			<element maxOccurs="unbounded" minOccurs="0" name="PhoneNumber" type="tns:PhoneNumberDetailedType"/>
+		</sequence>
+	</complexType>
+	<complexType name="ContactInfoType">
+		<sequence>
+			<element minOccurs="0" name="Address" type="tns:AddressType"/>
+			<element minOccurs="0" name="PhoneNumber" type="string">
+				<annotation>
+					<documentation>10-digit phone number and 4-digit extension</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<simpleType name="CurrencyType">
+		<restriction base="decimal">
+			<totalDigits value="11"/>
+			<fractionDigits value="2"/>
+			<pattern value="-?\d{1,9}\.\d{2}"/>
+		</restriction>
+	</simpleType>
+	<complexType name="DateRangeType">
+		<annotation>
+			<documentation>Indicates a start and end date of a period.</documentation>
+		</annotation>
+		<sequence>
+			<element minOccurs="0" name="StartDate" type="date">
+				<annotation>
+					<documentation>Indicates the first date services were performed. Beginning of date range.</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="EndDate" type="date">
+				<annotation>
+					<documentation>Indicates the last date services were performed. End of date range.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ExpirableType">
+		<annotation>
+			<documentation>Indicates the effective and expiration dates.</documentation>
+		</annotation>
+		<sequence>
+			<element minOccurs="0" name="EffectiveDate" type="date"/>
+			<element minOccurs="0" name="ExpirationDate" type="date"/>
+		</sequence>
+	</complexType>
+	<simpleType name="MatchEnum">
+		<annotation>
+			<documentation>For matching two string values there are various options, including Exact, Partial, and Phonetic. This type defines these math types</documentation>
+		</annotation>
+		<restriction base="string">
+			<enumeration value="EXACT"/>
+			<enumeration value="PARTIAL"/>
+			<enumeration value="PHONETIC"/>
+			<enumeration value="STARTSWITH"/>
+			<enumeration value="ENDSWITH"/>
+			<enumeration value="CONTAINS"/>
+		</restriction>
+	</simpleType>
+	<complexType name="NameType">
+		<sequence>
+			<element minOccurs="0" name="Prefix" type="string"/>
+			<element minOccurs="0" name="First" type="string"/>
+			<element minOccurs="0" name="Last" type="string"/>
+			<element minOccurs="0" name="Middle" type="string"/>
+			<element minOccurs="0" name="Suffix" type="string"/>
+		</sequence>
+	</complexType>
+	<simpleType name="NonNegativeCurrencyType">
+		<restriction base="decimal">
+			<totalDigits value="11"/>
+			<fractionDigits value="2"/>
+			<pattern value="\d{1,9}\.\d{2}"/>
+		</restriction>
+	</simpleType>
+	<complexType name="PersonalInfoType">
+		<sequence>
+			<element minOccurs="0" name="Name" type="tns:NameType"/>
+			<element minOccurs="0" name="DateOfBirth" type="tns:SegmentedDateType"/>
+			<element minOccurs="0" name="GenderIndicator">
+				<simpleType>
+					<restriction base="string">
+						<pattern value="[MFU]"/>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="PhoneNumberDetailedType">
+		<sequence>
+			<element minOccurs="0" name="AreaCode" type="string"/>
+			<element minOccurs="0" name="Exchange" type="string">
+				<annotation>
+					<documentation>3 digit prefix to number</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="Number" type="string">
+				<annotation>
+					<documentation>Number of 4 digits</documentation>
+				</annotation>
+			</element>
+			<element minOccurs="0" name="Extension" type="string"/>
+		</sequence>
+	</complexType>
+	<complexType name="SegmentedDateType">
+		<sequence>
+			<element minOccurs="0" name="Year">
+				<simpleType>
+					<restriction base="string">
+						<length value="4"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element minOccurs="0" name="Month">
+				<simpleType>
+					<restriction base="string">
+						<minLength value="1"/>
+						<maxLength value="2"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element minOccurs="0" name="Day">
+				<simpleType>
+					<restriction base="string">
+						<minLength value="1"/>
+						<maxLength value="2"/>
+					</restriction>
+				</simpleType>
+			</element>
+		</sequence>
+	</complexType>
+	<simpleType name="YesNoIndicatorEnum">
+		<restriction base="string">
+			<pattern value="[YN]"/>
+		</restriction>
+	</simpleType>
+</schema>

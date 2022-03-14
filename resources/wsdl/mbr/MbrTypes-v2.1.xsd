@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema targetNamespace="urn:mbr2_1.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns:tns="urn:mbr2_1.schema.bcbsm.com" elementFormDefault="qualified" attributeFormDefault="unqualified" version="2.1.6">
+	<!--
+	=================== Change Log ===================
+		Version	: 2.1.6
+		Date		: 08/09/2011
+		Details		: MemberSequenceIdentifier maxlength restriction removed to support IDs from FEP..
+
+		Version	: 2.1.5
+		Date		: 11/09/2010
+		Details : Added PersonInfoType, CodeCategoryType, TransactionIndType from Member & Contract services.
+			Added AddressDetailType from Member & Contract service AddressType.
+			Added ContractType, CoverageHistoryType, PreConditionType, and StatusType from Member service.
+			
+		Version	: 2.1.4
+		Date		: 06/15/2010
+		Details		: MemberSSNIdentifier changed from int to string with 9-byte validation pattern.
+				Removed unused meta import
+
+		Version	: 2.1.3
+		Date		: 06/07/2010
+		Details		: ContractIdentifier.Number (also impacted ContractNumberType) length restriction is removed.
+		
+		Version	: 2.1.2
+		Date		: 11/25/2008
+		Details		: Made PersonInfoType in MemberInfoType to optional
+		
+		Version	: 2.1.1
+		Date		: 9/17/2008
+		Details		: Removed constraint from Group/Suffix to support longer BCN group suffix values.
+
+		Version	: 2.1
+		Date		: 9/11/2008
+		Details		: Added AlternateAddress to MemberContactInfo.
+				Added ExternalContractIdentifier and ExternalContractNumber for contract numbers that exceed 9 characters.
+
+		Version	: 2.0
+		Date		: 9/11/2008
+		Details		: SequenceNumber changed to MemberID
+				Modifed common schema to version 2.0
+				Modifed meta schema to version 1.1
+
+		Version	: 1.0.1
+		Date		: 9/11/2008
+		Details		: Updated namespace values.
+
+		Version	: 1.0
+		Date		: 4/25/2008
+		Details		: Initial version.
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<complexType name="AddressDetailType">
+		<annotation>
+			<documentation>Primary AddressType extended for status and identifier information.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="common:AddressType">
+				<sequence>
+					<element name="Type" type="tns:CodeCategoryType">
+						<annotation>
+							<documentation>Valid Values are :  MA - Mailing, MR - Rating, RA - Residential, SA - Student, ZO - Other </documentation>
+						</annotation>
+					</element>
+					<element name="Code" type="string" minOccurs="0">
+						<annotation>
+							<documentation>User defined code;  selected when the Address Type is ZO</documentation>
+						</annotation>
+					</element>
+					<element name="ID" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Unique identifier;  used to associate a member on the same contract to an existing address.  For example, this is normally the AddressIdentifier of the subscriber's address. If not shared (ShareAddrFlag="N", then set to "0" (zero).</documentation>
+						</annotation>
+					</element>
+					<element name="Primary" type="common:YesNoIndicatorEnum" minOccurs="0">
+						<annotation>
+							<documentation>Indicator whether this address is primary.  Valid Values are : Y - for primary;  N or Spaces - for not primary</documentation>
+						</annotation>
+					</element>
+					<element name="Shared" type="common:YesNoIndicatorEnum">
+						<annotation>
+							<documentation>Indicator whether other members share this address. Valid Values are :  Y - shared;  N - not shared</documentation>
+						</annotation>
+					</element>
+					<element name="StatusCode" type="tns:CodeCategoryType" minOccurs="0">
+						<annotation>
+							<documentation>Status code (still active) of the Address</documentation>
+						</annotation>
+					</element>
+					<element name="EffectiveDate" type="date" minOccurs="0">
+						<annotation>
+							<documentation>Date this address becomes effective to use.  User can edit for valid date</documentation>
+						</annotation>
+					</element>
+					<element name="ExpirationDate" type="date" minOccurs="0">
+						<annotation>
+							<documentation>Date this address may no longer be available  User can edit for valid date</documentation>
+						</annotation>
+					</element>
+					<element name="ReceiptDate" type="date" minOccurs="0">
+						<annotation>
+							<documentation>Date of the request to add this address information.  User can edit for valid date</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<simpleType name="CodeCategoryType">
+		<annotation>
+			<documentation>Standard lookup and code categories, normally two or four byte code (Reason Codes, Status Codes, Condition Codes, Explanation Codes, etc.)  </documentation>
+		</annotation>
+		<restriction base="string">
+			<minLength value="1"/>
+			<maxLength value="4"/>
+		</restriction>
+	</simpleType>
+	<complexType name="ContactType">
+		<sequence>
+			<element name="Address" type="tns:AddressDetailType" minOccurs="0" maxOccurs="4">
+				<annotation>
+					<documentation>Up to four addresses supported for each member.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ContractCrossReferenceType">
+		<annotation>
+			<documentation>Cross Reference</documentation>
+		</annotation>
+		<sequence>
+			<element name="NewContractNumber" type="tns:ContractNumberType">
+				<annotation>
+					<documentation>New Contract Number</documentation>
+				</annotation>
+			</element>
+			<element name="Reason" type="string">
+				<annotation>
+					<documentation>Reason  for cross reference. String of length 3 for NASCO</documentation>
+				</annotation>
+			</element>
+			<element name="DateRange" type="common:ExpirableType"/>
+			<element name="EndDateReason" type="string">
+				<annotation>
+					<documentation>String of length 4 on NASCO</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="ContractInfoType">
+		<annotation>
+			<documentation>Contract Information</documentation>
+		</annotation>
+		<sequence>
+			<element name="ContractNumber" type="tns:ContractNumberType"/>
+			<element name="Group" type="tns:GroupType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="ContractIdentifier">
+		<annotation>
+			<documentation>Contract ID that can be used to identify a contract. This field generically specifies the contract number and may be used in various forms.  Specific format should be presented by the elements realizing this type.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Number" type="string"/>
+		</sequence>
+	</complexType>
+	<complexType name="ContractNumberType">
+		<annotation>
+			<documentation>Contract ID that can be used to identify a contract. It consists of and 3 character prefix, 9 character contract number, and possibly a 4 character extent.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ContractIdentifier">
+				<sequence>
+					<element name="AlphaPrefix" minOccurs="0">
+						<simpleType>
+							<restriction base="string">
+								<length value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="Extent" minOccurs="0">
+						<simpleType>
+							<restriction base="string">
+								<length value="4"/>
+							</restriction>
+						</simpleType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<simpleType name="ContractTypeEnum">
+		<annotation>
+			<documentation>Descriptions are Planspecific, for example: 1 (Group), 2 (Non-group), 3 (Workers' compensation), 4 (Accidental injury). Note: Value is required with OtherCoverageIndicator of Y and DetailActionCode of A</documentation>
+		</annotation>
+		<restriction base="nonNegativeInteger">
+			<pattern value="[1234]"/>
+		</restriction>
+	</simpleType>
+	<complexType name="CoverageHistoryType">
+		<sequence>
+			<element name="OtherCarrierIdentifier" type="string">
+				<annotation>
+					<documentation>Identifier associated with other carrier company</documentation>
+				</annotation>
+			</element>
+			<element name="EffectiveDate" type="date"/>
+			<element name="ExpirationDate" type="date" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="CoverageSpanType">
+		<annotation>
+			<documentation>This defines the timespan for which the contract is active; there MAY be multiple (upto 5) spanTypes per contract. One of the required elements for creating, updating, reinstating and voiding a contract in Metavance. Metavance CoverageTypeSpan has Action field which has values A, C, V, and R. CreateContract would call backend with Action of A and updateContact would call with action of C...</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ContractInfoType">
+				<sequence>
+					<element name="ContractTypeCode" type="tns:ContractTypeEnum"/>
+					<element name="ControlPlan" type="tns:PlanCodeType" minOccurs="0"/>
+					<element name="RatePackageID" type="string">
+						<annotation>
+							<documentation>Rate Package identifier; currently defined as string of length 4 for NASCO systems. </documentation>
+						</annotation>
+					</element>
+					<element name="EmployerGroup" type="tns:GroupType" minOccurs="0">
+						<annotation>
+							<documentation>This defines employer group and Division (Number+Division) with which the coverage contract is associated (Number+Section). </documentation>
+						</annotation>
+					</element>
+					<element name="BusinessLevel" type="string" minOccurs="0" maxOccurs="4">
+						<annotation>
+							<documentation>Business Level 4, 5, 6, and 7 ID. Metavance required this field for creating contract.</documentation>
+						</annotation>
+					</element>
+					<element name="RequestDate" type="date" minOccurs="0">
+						<annotation>
+							<documentation>This is the date when contract was requested. It may be different from current date. </documentation>
+						</annotation>
+					</element>
+					<element name="CoverageDateRange" type="common:ExpirableType" minOccurs="0"/>
+					<element name="CoverageEndReasonCode" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Reason code for end date; currently defined as string of length 4 for NASCO systems. </documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="EmploymentInfoType">
+		<annotation>
+			<documentation>Employment information</documentation>
+		</annotation>
+		<sequence>
+			<element name="EmploymentStatus" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Current values for NASCO used in COB services are A: Active, R: Retired, L: Laid Off. 
+										Currently for CreateContract service it's a string of length 4 for NASCO</documentation>
+				</annotation>
+			</element>
+			<element name="DateRange" type="common:ExpirableType" minOccurs="0">
+				<annotation>
+					<documentation>Date range represents start and end date for employment. For COB services it may mean effective and cancel date for other coverage. </documentation>
+				</annotation>
+			</element>
+			<element name="EmployerName" type="string" minOccurs="0"/>
+			<element name="EmployerAddress" type="common:AddressType" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="ExternalContractIdentifier">
+		<annotation>
+			<documentation>External contract numbers of may have length greater than 9. Contract ID that is used to identify a contract. It can be upto 14 character length.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Number" type="string"/>
+		</sequence>
+	</complexType>
+	<complexType name="ExternalContractNumberType">
+		<annotation>
+			<documentation>External contract numbers of may have length greater than 9.  In conjunction with ExternalContractIdentifier this is used to further identify a contract. It consists of and 3 character prefix, a greater than 9 character contract number, and possibly a 4 character extent.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="tns:ExternalContractIdentifier">
+				<sequence>
+					<element name="AlphaPrefix" minOccurs="0">
+						<simpleType>
+							<restriction base="string">
+								<length value="3"/>
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="Extent" minOccurs="0">
+						<simpleType>
+							<restriction base="string">
+								<length value="4"/>
+							</restriction>
+						</simpleType>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GroupIdentifier">
+		<sequence>
+			<element name="Number">
+				<simpleType>
+					<restriction base="string">
+						<minLength value="5"/>
+						<maxLength value="9"/>
+					</restriction>
+				</simpleType>
+			</element>
+			<element name="Suffix" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Group suffix number the contract is associated with.  For NASCO this is equivalent section number.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="GroupType">
+		<complexContent>
+			<extension base="tns:GroupIdentifier">
+				<sequence>
+					<element name="Division" type="string" minOccurs="0"/>
+					<element name="Name" type="string" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="MemberContactType">
+		<complexContent>
+			<extension base="tns:MemberInfoType">
+				<sequence>
+					<element name="Address" type="common:AddressType"/>
+					<element name="Phone" type="common:PhoneNumberDetailedType" minOccurs="0"/>
+					<element name="AlternateAddress" type="common:AddressType" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<simpleType name="MemberDINIdentifier">
+		<annotation>
+			<documentation>System's Deidentified Number</documentation>
+		</annotation>
+		<restriction base="string"/>
+	</simpleType>
+	<complexType name="MemberInfoType">
+		<annotation>
+			<documentation>Member Information. Subscriber is a member so this can be used as subscriber too.</documentation>
+		</annotation>
+		<sequence>
+			<element name="MemberID" type="tns:MemberSequenceIdentifier" minOccurs="0">
+				<annotation>
+					<documentation>Indicates the unique number of the member within the contract</documentation>
+				</annotation>
+			</element>
+			<element name="PersonInfo" type="common:PersonalInfoType" minOccurs="0"/>
+			<element name="RelationshipCode" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<simpleType name="MemberSequenceIdentifier">
+		<annotation>
+			<documentation>System's sequence number for the member. e.g. 01, 02, 03, etc.  For some systems leading zeroes are dropped. Also referred to as Member ID</documentation>
+		</annotation>
+		<restriction base="string">
+			<minLength value="1"/>
+		</restriction>
+	</simpleType>
+	<simpleType name="MemberSSNIdentifier">
+		<annotation>
+			<documentation>Social Security Number (no hyphens or spaces)</documentation>
+		</annotation>
+		<restriction base="string">
+			<pattern value="[0-9]{9}"/>
+		</restriction>
+	</simpleType>
+	<complexType name="PersonInfoType">
+		<annotation>
+			<documentation>Primary information to identify a person or human being.  Not necessarily a member.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="common:PersonalInfoType">
+				<sequence>
+					<element name="UpdateNameHistoryFlag" type="common:YesNoIndicatorEnum" minOccurs="0">
+						<annotation>
+							<documentation>Indicator of whether a name history record should be created for this name change. Valid values are Y, N or spaces.  This is for auditing purposes.</documentation>
+						</annotation>
+					</element>
+					<element name="DateofDeath" type="date" minOccurs="0">
+						<annotation>
+							<documentation>Date of Death of the person.</documentation>
+						</annotation>
+					</element>
+					<element name="SSN" type="tns:MemberSSNIdentifier" minOccurs="0">
+						<annotation>
+							<documentation>Social Security Number of the person.</documentation>
+						</annotation>
+					</element>
+					<element name="MaritalStatusCode" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Person's Marital Status</documentation>
+						</annotation>
+					</element>
+					<element name="OrigEffectiveDate" type="date" minOccurs="0">
+						<annotation>
+							<documentation>Original date the personl had coverage or some type of service.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<simpleType name="PlanCodeType">
+		<annotation>
+			<documentation>NASCO plan code; also known as control plan code</documentation>
+		</annotation>
+		<restriction base="string">
+			<maxLength value="3"/>
+		</restriction>
+	</simpleType>
+	<complexType name="PreConditionType">
+		<sequence>
+			<element name="ConditionType" type="string">
+				<annotation>
+					<documentation>Identifies the condition, the member is totally disabled, or is in waiting period at the Division level regarding pre-existing conditions. Valid values are M, T, D</documentation>
+				</annotation>
+			</element>
+			<element name="ConditionCode" type="tns:CodeCategoryType">
+				<annotation>
+					<documentation>User defined code indicationing a category/classification of the pre-existing condition.</documentation>
+				</annotation>
+			</element>
+			<element name="EffectiveDate" type="date">
+				<annotation>
+					<documentation>When the precondition is acknowledged as current with the system.</documentation>
+				</annotation>
+			</element>
+			<element name="ExpirationDate" type="date" minOccurs="0">
+				<annotation>
+					<documentation>This is conditionally required based on the ConditionType</documentation>
+				</annotation>
+			</element>
+			<element name="ExplainCode" type="tns:CodeCategoryType" minOccurs="0">
+				<annotation>
+					<documentation>Explanation category of the pre-existing condition.  A user defined code;  for adding a member, this field is required for ConditionType=T</documentation>
+				</annotation>
+			</element>
+			<element name="InvestigationType" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Identifies whether the investigation is based on a disability that began prior to enrollment, during coverage while coverage is in effect or during coverage and coverage is no longer in effectConditionally required; Required when Condition Type is T.  Values are:  (B)efore Enrollment,  (D)uring Coverage, (U)pon Termination.</documentation>
+				</annotation>
+			</element>
+			<element name="DisabilityDate" type="date" minOccurs="0">
+				<annotation>
+					<documentation>Date when the member's disability began;  Required when ConditionType is T</documentation>
+				</annotation>
+			</element>
+			<element name="AccidentClaimBypass" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="StatusType">
+		<sequence>
+			<element name="Code" type="string">
+				<annotation>
+					<documentation>User defined status code</documentation>
+				</annotation>
+			</element>
+			<element name="Type" type="string">
+				<annotation>
+					<documentation>Member status type either: Claims, Billing, Underwriting or Other.</documentation>
+				</annotation>
+			</element>
+			<element name="EffectiveDate" type="date"/>
+			<element name="ExpirationDate" type="date" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<simpleType name="TransactionIndType">
+		<annotation>
+			<documentation>Transaction indicator type for backend, normally (A)dd, (C)hange, (V)oid.  Others include (T)erminate and (R)einstate.  These values could change at any time, so enumeration is not used.</documentation>
+		</annotation>
+		<restriction base="string">
+			<length value="1"/>
+		</restriction>
+	</simpleType>
+</schema>

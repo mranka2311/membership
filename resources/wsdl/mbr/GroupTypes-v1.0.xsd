@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.4 U (http://www.xmlspy.com) by BCBSM (Blue Cross Blue Shield of MI) -->
+<schema xmlns:tns="urn:group1_0.mbr.schema.bcbsm.com" xmlns:meta="urn:meta1_1.schema.bcbsm.com" xmlns:mbr="urn:mbr2_1.schema.bcbsm.com" xmlns:common="urn:common2_0.schema.bcbsm.com" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:group1_0.mbr.schema.bcbsm.com" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0.13">
+	<!--
+	=================== Change Log ===================
+		Version : 1.0.13	       
+		Date		 : 09/07/2018 
+		Details	 : Added element DOL to CompanyType.
+	
+		version : 1.0.12
+			Date	: 06/18/2018
+			Details	: Added elements ContractSize, PHIIND, PlanSponsorCert with attribute groupType and 
+					GrpFormatCD is added specify the group number code to Group number and Non Localgroup Number in RtrvGrpDetailsResponse
+	
+		Version : 1.0.11	       
+		   Date		 : 04/20/2018 
+		   Details	 : Added element OwnershipCode to CompanyType.
+					   Added element PA250 to GrpInfoType.
+		
+		Version : 1.0.10	       
+		   Date		 : 12/20/2016 
+		   Details	 : Added element ClassID to GroupIdentifierType.
+		   			   	
+		Version : 1.0.9
+	       
+		   Date		 : 08/07/2016 
+		   Details	 : Added Segment to RtrvGrpDetailsResponse
+		   			   Added ServicingVendorType to RtrvGrpDetailsResponse
+		   			   Added PackageCode and IncludeServicingVendorInfo to RtrvGrpDetailsRequest		   
+
+		Version : 1.0.8
+	       
+		   Date		 : 01/07/2016 
+		   Details	 : Added UseCacheInd to RtrvGrpDetailReqPayloadType
+		
+		Version : 1.0.7
+	       Date      : 08/11/2014
+	       Details   : Added new element ExchangeInd in RtrvGrpDetailReqPayloadType.
+	
+		Version : 1.0.6
+		   Date : 06/25/2014
+		   Details : Added a new element named ServicePlanCode for RtrvGrpDetail operation in RtrvGrpDetailReqPayloadType. 
+		   			 Added a new elements named AlphaPrefix and PrefixEffectiveDate for RtrvGrpDetail operation in RtrvGrpDetailRespPayloadType.
+		
+		Version : 1.0.5
+	       Date	 : 04/22/2014
+	       Details	 : Added new element PhoneExtension under PhoneNumberType parent
+		
+		
+		Version : 1.0.4
+	       Date	 : 10/31/2012,10/26/2012,10/16/2012,08/30/2012,01/10/2013,02/25/2013
+	       Details	 :Member Portal R0 and SBC
+	       		   Added new element called IBUInd to ProductInfo element. If the group is IBU, IBUInd element value is Y or N. 	
+	       		   Added PlanInfo element and PrescriptionDrugInfo element.
+	       		   Added Benefit mgr code and description to phone element.	
+	       		   Added group section pkg and bpid information. Group service will be returning all associated pakage and bpid for a group and section combination.
+	       		   Service will return  product name, network name and network ID at BPID level for NASCO groups. For auto national product info returned at package level.	
+	       		   Added Business Segment to Phone element.
+	       		   Added Medicare Advanatage field to identify if the group belongs to Medicare Adv; help in bring default phone numbers
+	       		   Added two new fileds to Group element RatingCode and GlidePathIndicator.
+	       		  Customer service representative number is stored in geno table. 
+	       		  added LOBCode and BenefitCarveOut to phone element
+	       		  Toll free and direct number for a group is returned from this table in phone element. 
+	       		  New phone type TOLLFREE and DIRECT are added to PHONEtypeCodes.
+	       		  Reintroduced CompanyType to handle nested complex type.
+	       		  Added NonLocalGroupType to handle nested complex type.
+	       		  Added BenefitType to handle nested complex type.
+			
+
+		 Version : 1.0.3
+	       Date	 : 10/31/2012,10/26/2012,10/16/2012,08/30/2012,12/11/2012,12/13/2012
+	       Details	 :	GlidePath Project SBP13138
+	       		   	Added two new fileds to Group element RatingCode and GlidePathIndicator.
+	       		  	Added NonLocalGroup element to Group element.  Any Non-Local group number and section will be returned in this element. Eg NASCO group and section, BCN Group 					and Section.. etc. 
+					Added Source System child element to NonLocalGroup to identify source system of non-local group.
+
+		Version	: 1.0.2
+		Date		: 01/25/2012
+		Details		:  MOS Group Extract - Automated BCC project
+					  -ThirdPartyBillerCode,SalesOfficeCode & TerritoryCode elements are added to Billing node.  SponsorID element is added to Association node.  FederalTaxID element is 					    added to Company node.
+					  - AddressType is created and references from CommonTypes for AddressType changed to GroupTypes specific AddressType.
+					  		  
+		Version	: 1.0.1
+		Date		: 12/09/2010
+		Details		: 
+					  -Added new fields to Billing node.  They are EntityCode and EntityEffectiveDate
+		                      -Changed "date" types to "string" in RtrvGrpDetail to fix WAS7 timezone appending issue.
+		                       (GMT "-5:00" hours) was part of the response for a date, even though no time showed up.
+		                       
+		Version	: 1.0.0
+		Date		: 03/08/2010, 03/10/2010, 3/15/2010, 03/02/2011
+		Details		: Initial version.		
+					: Schema Approval Revew - 3/10/2010
+					  -Changed operation name LocateUpdMTVGrps to LocateUpdGrps
+					  -LocateUpdGrpsResponse: LastUpdatedTime changed to LastUpdDateTime.  Datatype changed from date to dateTime
+					  -Segmented Date Types changed to standard date types.
+					  -Agent Code changed to AgentID.
+					  -Agency Information moved from root object to child of Agent object.  Renamed Agent object to AgentInfo.
+					  -Removed Agency complex type. 
+					  -Complex types rename to short form (i.e. Group to Grp, Eligibility to Elig)
+					  -Filled in proper descriptions for all TBD annotations.
+					  -Create tns namespace IDNameType to replace CodeDescriptionType.
+					  -Removed CompanyType and use IDNameType for the Company object.
+					  -Group.Department renamed to Group.MailInstCode	
+					:Interal QR Revew - 3/15/2010
+					  -Group.CancelDate renamed CancelRequestDate in Eligibility branch.
+					  -Group.Expiration date added in Eligibility branch.
+					:IM338056
+					  -BillingCycleDay element's type is changed from int to string.					  
+-->
+	<import namespace="urn:common2_0.schema.bcbsm.com" schemaLocation="../common/CommonTypes-v2.0.xsd"/>
+	<import namespace="urn:meta1_1.schema.bcbsm.com" schemaLocation="../common/MetaTypes-v1.1.xsd"/>
+	<import namespace="urn:mbr2_1.schema.bcbsm.com" schemaLocation="MbrTypes-v2.1.xsd"/>
+	<element name="LocateUpdGrpsRequest">
+		<annotation>
+			<documentation>Request for LocateUpdGrps</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType"/>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="LocateUpdGrpsResponse">
+		<annotation>
+			<documentation>Response for LocateUpdGrps</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:LocateUpdGrpsRespPayloadType" minOccurs="0">
+							<annotation>
+								<documentation>Payload for Locate Updated Mgrt Groups Response.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="RtrvGrpDetailRequest">
+		<annotation>
+			<documentation>Request for RtrvGrpDetail</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:ReqMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:RtrvGrpDetailReqPayloadType">
+							<annotation>
+								<documentation>Payload for Retrieve Group Detail Request.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<element name="RtrvGrpDetailResponse">
+		<annotation>
+			<documentation>Response for RtrvGrpDetail</documentation>
+		</annotation>
+		<complexType>
+			<complexContent>
+				<extension base="meta:RespMessageTemplateType">
+					<sequence>
+						<element name="PayloadArea" type="tns:RtrvGrpDetailRespPayloadType" minOccurs="0">
+							<annotation>
+								<documentation>Payload for Retrieve Group Detail Response.</documentation>
+							</annotation>
+						</element>
+					</sequence>
+				</extension>
+			</complexContent>
+		</complexType>
+	</element>
+	<complexType name="AddressType">
+		<sequence>
+			<element name="Street" minOccurs="0" maxOccurs="10">
+				<complexType>
+					<simpleContent>
+						<extension base="string">
+							<attribute name="line" type="string" use="optional"/>
+						</extension>
+					</simpleContent>
+				</complexType>
+			</element>
+			<element name="City" type="string" minOccurs="0"/>
+			<element name="County" type="string" minOccurs="0"/>
+			<element name="StateProvince" type="string" minOccurs="0"/>
+			<element name="PostalCode" type="string" minOccurs="0"/>
+			<element name="Country" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="AgentType">
+		<annotation>
+			<documentation>Agent and and potential Agency information</documentation>
+		</annotation>
+		<sequence>
+			<element name="AgentID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The shorthand 5-byte code assigned to the Agent.  Also known as the Agent Code.</documentation>
+				</annotation>
+			</element>
+			<element name="AgentName" type="common:NameType" minOccurs="0">
+				<annotation>
+					<documentation>Full name of the Agent in separate parts (First, Last, etc)</documentation>
+				</annotation>
+			</element>
+			<element name="AgencyID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The shorthand 5-byte code assigned to the Agency. Also referred to as the Agency Code.  This is the Agency and Agent is assigned too.  An Agent does not necessarily have to be part of an Agency.</documentation>
+				</annotation>
+			</element>
+			<element name="ManagingAgency" type="tns:IDNameType" minOccurs="0">
+				<annotation>
+					<documentation>The Managing Agency in separate parts by ID (i.e. the 2-Byte Managing Agency Code) and the Name (i.e. the Managing Agency Name).  This is a  subsidiary agency which may be handling the Group account.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="GroupIdentifierType">
+		<complexContent>
+			<extension base="mbr:GroupIdentifier">
+				<sequence>
+					<element name="PackageCode" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Package Code used for filtering Serving Vendor iinfo in the response.   Only applies if IncludeServicingVendorinfo is Y</documentation>
+						</annotation>
+					</element>
+					<element name="ClassID" type="string" minOccurs="0">
+						<annotation>
+							<documentation>A member or group class identifier, can be used to narrow group name search. Applicable to BCN groups from SMARTDB.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="BPIDInfoType">
+		<complexContent>
+			<extension base="common:CodeDescriptionType">
+				<sequence>
+					<element name="DateRange" type="common:DateRangeType" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="ContactType">
+		<annotation>
+			<documentation>Address, phone, and person contact information.</documentation>
+		</annotation>
+		<sequence>
+			<element name="ContactTypeCode" type="string">
+				<annotation>
+					<documentation>The type of contact information. Example: "BILLING", "CEO", "MAILING", "PHYSICAL", "DELTAMAILING".  See Service Mapping for all values.</documentation>
+				</annotation>
+			</element>
+			<element name="Name" type="common:NameType" minOccurs="0">
+				<annotation>
+					<documentation>The name of the people/person to contact, if a person is assigned to this contact information.</documentation>
+				</annotation>
+			</element>
+			<element name="Address" type="tns:AddressType" minOccurs="0"/>
+			<element name="Phone" type="tns:PhoneNumberType" minOccurs="0" maxOccurs="unbounded"/>
+		</sequence>
+	</complexType>
+	<complexType name="GrpAssnType">
+		<annotation>
+			<documentation>Group Association</documentation>
+		</annotation>
+		<sequence>
+			<element name="Code" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The type of Association (i.e. Chamber, Association, Leasing Company)</documentation>
+				</annotation>
+			</element>
+			<element name="Name" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Long form name of the Association.</documentation>
+				</annotation>
+			</element>
+			<element name="Acronym" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Shorthand name of the Association.</documentation>
+				</annotation>
+			</element>
+			<element name="SponsorID" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="GrpBillingType">
+		<annotation>
+			<documentation>Billing and invoice information for a Group</documentation>
+		</annotation>
+		<sequence>
+			<element name="RateRenewalDate" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The Group date of renewal for a billing purposes.</documentation>
+				</annotation>
+			</element>
+			<element name="GraceCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The Group grace period code for billing.  This is not a number, but a code which relates to a grace period number.  Example: 000=Zero days for One-subscriber groups or Reinstated groups – originally canceled for non-payment
+005=30 days for ASC groups, General groups and Auto/National groups (includes area, industry and ERS groups
+</documentation>
+				</annotation>
+			</element>
+			<element name="InvoiceCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Used for invoice sequencing. Example:                 0=Contract Order
+1=Alpha Order
+2=Badge Order
+3=Alpha within Badge
+4=Badge within Service
+5=Contract within Service
+6=Alpha within Service
+</documentation>
+				</annotation>
+			</element>
+			<element name="NewHireOptionCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>For a group, determines when coverage (i.e. coverage dates) is applied to its members upon hiring an employee.  Example values:
+0=Contract Order
+1=Alpha Order
+2=Badge Order
+3=Alpha within Badge
+4=Badge within Service
+5=Contract within Service
+6=Alpha within Service
+</documentation>
+				</annotation>
+			</element>
+			<element name="BillingCycleDay" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The day of the month for billing a Group (1-31)</documentation>
+				</annotation>
+			</element>
+			<element name="EntityCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Whether the Group is billed at the Group, Division, or Contract level for ASO or mixed billing purposes.  This may be used for regular Premium billing in the future.  Valid values are (G)roup, (Division), or (C)ontract.</documentation>
+				</annotation>
+			</element>
+			<element name="EntityEffectiveDate" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The effective date of the billing entity codeThis is for ASO and mixed billing at this time, but could be used for premium billing in the future.</documentation>
+				</annotation>
+			</element>
+			<element name="ThirdPartyBillerCode" type="string" minOccurs="0"/>
+			<element name="SalesOfficeCode" type="string" minOccurs="0"/>
+			<element name="TerritoryCode" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="GrpEligType">
+		<annotation>
+			<documentation>Eligibility information for a Group</documentation>
+		</annotation>
+		<sequence>
+			<element name="EffectiveDate" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The Group effective date of eligibility</documentation>
+				</annotation>
+			</element>
+			<element name="ExpirationDate" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The Group actual eligibility end date of expiration </documentation>
+				</annotation>
+			</element>
+			<element name="CancelRequestDate" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The Group requested cancellation date. Note, this is not the eligibility end date or termination date.</documentation>
+				</annotation>
+			</element>
+			<element name="OriginalEnrollmentDate" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The initial date the Group enrolled</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="NonLocalGroupType">
+		<complexContent>
+			<extension base="mbr:GroupIdentifier">
+				<sequence>
+					<element name="SourceSystem" type="string" minOccurs="0"/>
+					<element name="GrpFormatCD" type="string" minOccurs="0">
+						<annotation>
+							<documentation>GrpFormatCD for Group Number BCBSM = 000, BCN = 100, MTV = 200</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="GrpInfoType">
+		<annotation>
+			<documentation>High level group information extended for Vender Specific requests.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="mbr:GroupIdentifier">
+				<sequence>
+					<element name="GrpFormatCD" type="string" minOccurs="0">
+						<annotation>
+							<documentation>GrpFormatCD for Group Number BCBSM = 000, BCN = 100, MTV = 200</documentation>
+						</annotation>
+					</element>
+					<element name="NonLocalGroup" type="tns:NonLocalGroupType" minOccurs="0" maxOccurs="unbounded">
+						<annotation>
+							<documentation>Non Local Group and Section. If contract is associated with NASCO, this element will contain NASCO group and section </documentation>
+						</annotation>
+					</element>
+					<element name="Name" type="string" minOccurs="0">
+						<annotation>
+							<documentation>The Group Name</documentation>
+						</annotation>
+					</element>
+					<element name="Status" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Determine if a group is Active, Cancelled, or Terminated</documentation>
+						</annotation>
+					</element>
+					<element name="IBUInd" type="common:YesNoIndicatorEnum" minOccurs="0">
+						<annotation>
+							<documentation>Determine if a group is ibu or not</documentation>
+						</annotation>
+					</element>
+					<element name="ClusterCode" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Determines the Group size</documentation>
+						</annotation>
+					</element>
+					<element name="ERISAExempt" type="common:YesNoIndicatorEnum" minOccurs="0">
+						<annotation>
+							<documentation>Employee Retirement Income Security Act (ERISA) exemption allowed or not.</documentation>
+						</annotation>
+					</element>
+					<element name="PA250" type="common:YesNoIndicatorEnum" minOccurs="0">
+						<annotation>
+							<documentation>PA250 Indicator</documentation>
+						</annotation>
+					</element>
+					<element name="RiskCell" type="string" minOccurs="0">
+						<annotation>
+							<documentation>A 3-byte alphanumeric risk assessment (normally a 3-digit number) of an employer.  Example:    402=Value Blue Group Conversion            404=Flexible Blue Individual Market Group Conversion                             </documentation>
+						</annotation>
+					</element>
+					<element name="MailInstrCode" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Indicates code to identify mailing instuction requirements for the Group.</documentation>
+						</annotation>
+					</element>
+					<element name="RatingCode" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Group rating code</documentation>
+						</annotation>
+					</element>
+					<element name="GlidePathInd" type="common:YesNoIndicatorEnum" minOccurs="0">
+						<annotation>
+							<documentation>Indicates if Group participates in Glidepath. Possible values are:  Yes or No</documentation>
+						</annotation>
+					</element>
+					<element name="MedicareAdvantage" type="string" minOccurs="0">
+						<annotation>
+							<documentation>This field indicates Medicare Advantage Rider value.</documentation>
+						</annotation>
+					</element>
+					<element name="ProductLine" type="string" minOccurs="0">
+						<annotation>
+							<documentation>BCN can be determined in SMART by looking at the field on the Group record “Product Line”, BCN will be indicated by “HMO” in the product line field.  </documentation>
+						</annotation>
+					</element>
+					<element name="AlphaPrefix" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Custom Alpha Prefix column from the Group table of the SMART DB  </documentation>
+						</annotation>
+					</element>
+					<element name="PrefixEffectiveDate" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Prefix Date column from the Group table of the SMART DB  </documentation>
+						</annotation>
+					</element>
+					<element name="ExchangeInd" type="string" minOccurs="0">
+						<annotation>
+							<documentation>'Y' indicates that the Group is On Exchange;  'N' indicates that the Group is Off Exchange;  Blank indicates 'Not Determined'</documentation>
+						</annotation>
+					</element>
+					<element name="Segment" type="string" minOccurs="0">
+						<annotation>
+							<documentation>Segment field used to identify whether it is MA split contract or not</documentation>
+						</annotation>
+					</element>
+					<element name="ContractSize" type="string" minOccurs="0"/>
+					<element name="PHIIND" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+					<element name="PlanSponsorCert" type="tns:PlanSponsorCertType" minOccurs="0" maxOccurs="99">
+						<annotation>
+							<documentation>ASC/ERS Plan Sponsor Cert Signed</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="IDNameType">
+		<annotation>
+			<documentation>Identification code with a verbose descriptive name</documentation>
+		</annotation>
+		<sequence>
+			<element name="ID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Short form code value.</documentation>
+				</annotation>
+			</element>
+			<element name="Name" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Long form descriptive name for the ID.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="PlanSponsorCertType">
+		<simpleContent>
+			<extension base="string">
+				<attribute name="groupType" type="string"/>
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="LocateUpdGrpsRespPayloadType">
+		<annotation>
+			<documentation>Group and Suffix must be returned with a last updated timestamp.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Group" type="tns:LocateUpdGrpType" maxOccurs="unbounded">
+				<annotation>
+					<documentation>Group Number, Group Suffix and last updated information.</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="LocateUpdGrpType">
+		<annotation>
+			<documentation>Group and Suffix must be returned with a last updated timestamp.</documentation>
+		</annotation>
+		<complexContent>
+			<extension base="mbr:GroupIdentifier">
+				<sequence>
+					<element name="LastUpdDateTime" type="dateTime">
+						<annotation>
+							<documentation>The Groups last updated timestamp.</documentation>
+						</annotation>
+					</element>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="PlanInfoType">
+		<sequence>
+			<element name="PlanName" type="string" minOccurs="0"/>
+			<element name="PlanID" type="string" minOccurs="0"/>
+			<element name="PlanAlphaPrefix" type="string" minOccurs="0"/>
+		</sequence>
+	</complexType>
+	<complexType name="PrescriptionDrugInfoType">
+		<sequence>
+			<element name="RxBin" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Prescription Drugs Benefit Identifier</documentation>
+				</annotation>
+			</element>
+			<element name="RxGrp" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Prescription Drugs Group Identifier</documentation>
+				</annotation>
+			</element>
+			<element name="RxPcn" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Prescription Drugs Process Control Number</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="BenefitType">
+		<choice>
+			<element name="Pkg" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Package [Auto National groups have package ]</documentation>
+				</annotation>
+			</element>
+			<element name="BPIDInfo" type="tns:BPIDInfoType" minOccurs="0">
+				<annotation>
+					<documentation>Information about BPID ID</documentation>
+				</annotation>
+			</element>
+		</choice>
+	</complexType>
+	<complexType name="ProductInfoType">
+		<annotation>
+			<documentation>Group , Section and Product Association</documentation>
+		</annotation>
+		<sequence>
+			<element name="LOB" type="common:CodeDescriptionType" minOccurs="0">
+				<annotation>
+					<documentation>Medical -M Dental -D, Vision-V etc</documentation>
+				</annotation>
+			</element>
+			<element name="PkgOrBpid" type="tns:BenefitType"/>
+			<element name="Name" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Eg: Ford Blue Preferred Plus, Chrysler National PPO,Ford Vision</documentation>
+				</annotation>
+			</element>
+			<element name="NetworkName" type="string" minOccurs="0">
+				<annotation>
+					<documentation> EG: Ford Blue Preferred Plus PPO, Chrysler National PPO Non Bargaining Unit,VSP</documentation>
+				</annotation>
+			</element>
+			<element name="NetworkID" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Product Network ID  user friendly network id EG: FORDPPO, CHRYSPPO, VSP</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="PhoneNumberType">
+		<annotation>
+			<documentation>Open text format of a phone number.  Up to 25 characters.</documentation>
+		</annotation>
+		<sequence>
+			<element name="PhoneTypeCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>The shorthand code assigned to the base Agency information.  Valid values "OFFICE", "MOBILE", "FAX", "PAGER", "OTHER"</documentation>
+				</annotation>
+			</element>
+			<element name="BusinessSegment" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Indicates segment name EG: BCBSM;BCN;BCBSM-MA;BCN-MA</documentation>
+				</annotation>
+			</element>
+			<element name="LOB" type="common:CodeDescriptionType" minOccurs="0">
+				<annotation>
+					<documentation>Indicates Line of Business for CSR phone number possible values are "D" for Dental, "M" Medical, "V" Vision, "X" Pharmacy</documentation>
+				</annotation>
+			</element>
+			<element name="BenefitCarveout" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Benefit Carveout  possible values arePhysical Theorapy; Mental Health Substance abuse</documentation>
+				</annotation>
+			</element>
+			<element name="BenefitMgrName" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Benefit Manager  name]</documentation>
+				</annotation>
+			</element>
+			<element name="PhoneNumber" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Full string phone number with area code, exchange, number, and extension extension.  May include non-numeric and special characters.  Any character allowed.</documentation>
+				</annotation>
+			</element>
+			<element name="PhoneExtension" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Phone extension for contact.  May include non-numeric and special characters. </documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="RtrvGrpDetailReqPayloadType">
+		<annotation>
+			<documentation>High level group information.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Group" type="tns:GroupIdentifierType">
+				<annotation>
+					<documentation>The Group Number and Suffix are both required.</documentation>
+				</annotation>
+			</element>
+			<element name="ServicePlanCode" type="string" minOccurs="0">
+				<annotation>
+					<documentation>Service Plan Code is used to get the contact details for the NSACO group. The possible values are 710, 834, 982</documentation>
+				</annotation>
+			</element>
+			<element name="UseCacheInd" type="common:YesNoIndicatorEnum" minOccurs="0">
+				<annotation>
+					<documentation>Indicates whether the service response data is  sourced from the cache or freshly from the back end systems.</documentation>
+				</annotation>
+			</element>
+			<element name="IncludeServicingVendorInfo" type="common:YesNoIndicatorEnum" default="N" minOccurs="0">
+				<annotation>
+					<documentation>Indicates whether the service retrieves Servicing Vendor Information from LDS MEMTELP db</documentation>
+				</annotation>
+			</element>
+		</sequence>
+	</complexType>
+	<complexType name="CompanyType">
+		<complexContent>
+			<extension base="tns:IDNameType">
+				<sequence>
+					<element name="FederalTaxID" type="string" minOccurs="0"/>
+					<element name="OwnershipCode" type="string" minOccurs="0"/>
+					<element name="DOL" type="common:YesNoIndicatorEnum" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+	<complexType name="RtrvGrpDetailRespPayloadType">
+		<annotation>
+			<documentation>High level group information.</documentation>
+		</annotation>
+		<sequence>
+			<element name="Group" type="tns:GrpInfoType">
+				<annotation>
+					<documentation>The high level summary of Group information</documentation>
+				</annotation>
+			</element>
+			<element name="Eligibility" type="tns:GrpEligType" minOccurs="0">
+				<annotation>
+					<documentation>Eligibility information for a Group</documentation>
+				</annotation>
+			</element>
+			<element name="Company" type="tns:CompanyType" minOccurs="0">
+				<annotation>
+					<documentation>High level Company information for the Group.  The ID is also known as the CID.</documentation>
+				</annotation>
+			</element>
+			<element name="Billing" type="tns:GrpBillingType" minOccurs="0">
+				<annotation>
+					<documentation>Billing and invoice information for the Group.</documentation>
+				</annotation>
+			</element>
+			<element name="Contact" type="tns:ContactType" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>Contact (Type of Contact, Address, Phone, Person) information.</documentation>
+				</annotation>
+			</element>
+			<element name="Association" type="tns:GrpAssnType" minOccurs="0">
+				<annotation>
+					<documentation>Group Association information (Chambers, Association, Leasing Types)</documentation>
+				</annotation>
+			</element>
+			<element name="ProductInfo" type="tns:ProductInfoType" minOccurs="0" maxOccurs="unbounded">
+				<annotation>
+					<documentation>Group  package or BPID product info like name network</documentation>
+				</annotation>
+			</element>
+			<element name="AgentInfo" type="tns:AgentType" minOccurs="0">
+				<annotation>
+					<documentation>Agent assigned code and person information.</documentation>
+				</annotation>
+			</element>
+			<element name="PrescriptionDrugInfo" type="tns:PrescriptionDrugInfoType" minOccurs="0"/>
+			<element name="PlanInfo" type="tns:PlanInfoType" minOccurs="0"/>
+			<element name="ServicingVendor" type="tns:ServicingVendorType" minOccurs="0" maxOccurs="10"/>
+		</sequence>
+	</complexType>
+	<complexType name="ServicingVendorType">
+		<complexContent>
+			<extension base="common:ExpirableType">
+				<sequence>
+					<element name="RequestType" type="string" minOccurs="0"/>
+					<element name="Name" type="string" minOccurs="0"/>
+					<element name="Channel" type="string" minOccurs="0"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+</schema>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:spring="http://www.mulesoft.org/schema/mule/spring"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" 
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" 
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+        http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+        http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+        http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+        http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd
+        http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+        http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+        http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+        http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+        http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd
+        http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+        http://www.mulesoft.org/schema/mule/spring http://www.mulesoft.org/schema/mule/spring/current/mule-spring.xsd
+        http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+
+	<!-- NOTES TO SECURITY AND VULNERABILITY SCANNERS: 1) this is a project-generator. 
+		2) these two "global" properties are a) meant to be overridden on a per-project 
+		basis b) are meant to be hardcoded in development-mode (because developers 
+		need to know these to do thei job c) there are encrypted properties which 
+		are created per-environment (DEV, QA, PRD) etc., and are not exposed d) the 
+		REAL encryptionKey is provided at deployment time by sysadmins. See here 
+		- "A command line argument defined in the application Runtime Configuration 
+		will override the _____default value_____" - https://support.mulesoft.com/s/article/DataSense-error-in-Studio-7-application-using-VM-arguments 
+		i.e. the global-property value here will only be applicable to workstation-environment 
+		in the early phases of development -->
+	<apikit:config name="bp_getmembership-config" api="api\bpgetmembership.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />	
+	<global-property doc:name="globalPropertyMuleEnv"
+		doc:id="50a430db-9624-4ca1-bf3a-018039a6819a" name="mule.env" value="${mule.env}" />
+	<global-property doc:name="globalPropertyEncryptionKey"
+		doc:id="76ef33f0-3cd9-47e3-95d0-b1f9dc175034" name="encryptionKey"
+		value="1111222233334444" />
+	<configuration-properties doc:name="configurationProperties"
+		doc:id="regenerateMe5" file="configuration-${mule.env}.yaml" />
+	<secure-properties:config name="securePropertiesConfig"
+		doc:name="Secure Properties Config" doc:id="48c682d3-4250-4e6f-b77a-89e2ed19974f"
+		file="configuration-secure-${mule.env}.yaml" key="${encryptionKey}" />
+
+	<http:listener-config name="httpListenerConfig"
+		doc:name="HTTP Listener config" doc:id="8d308e6d-bfb9-4b78-9ad1-64cb36c6ac72">
+		<http:listener-connection host="${api.host}"
+			port="${https.private.port}" protocol="HTTPS" connectionIdleTimeout="${api.timeout}">
+			<tls:context>
+				<tls:key-store type="pkcs12" path="${mule.env}-api2api.p12"
+					keyPassword="${secure::passwordToKey}" password="${secure::passwordToKeyStore}" alias="*.${mule.env}-api2api.bcbsm.com"/>
+			</tls:context>
+		</http:listener-connection>
+	</http:listener-config>
+	
+	<import doc:name="coreLogging" doc:id="563bbcfe-7f2c-4ea7-a6fe-19c60ba35b25"
+		file="CoreLogging.xml" />
+	<import doc:name="global_coreLogging" doc:id="d08dd1a0-859a-4276-a310-2f37d6476b82"
+		file="global_coreLogging.xml" />
+	<import doc:name="coreExceptionHandling" doc:id="a3c648e0-2afb-46f6-8d12-90d8e1c6f148"
+		file="CoreExceptionHandling.xml" />
+	<import doc:name="global_coreExceptionHandling" doc:id="be6ccbb7-e65a-4c5f-8da0-998aa451cb03"
+		file="global_coreExceptionHandling.xml" />
+	<import doc:name="cacheAPIErrorMappings" doc:id="d47ea8e2-edcf-4071-85c8-ba766fe7fd4f"
+		file="cacheAPIErrorMappings.xml" />
+	<!-- <import doc:name="Import global_eventBasedLogging" doc:id="0fa48edd-f4a6-441c-aef0-31725d60e697"
+        file="global_eventBasedLogging.xml"/> -->
+		
+	<api-gateway:autodiscovery apiId="${api.autodiscoveryId}" doc:name="API Autodiscovery" doc:id="8284dcf4-5d72-45b5-a6d8-6a2999652b00" flowRef="bpgetmembership-main" />
+  
+	<tls:context name="TLS_Context" doc:name="TLS_Context"
+		doc:id="4fa8fc52-ae57-461b-ae85-06276daf774c">
+		<tls:trust-store path="${trustStorePath}"
+			password="${secure::passwordToTrustStore}" type="pkcs12" insecure="${insecure}"/>
+	</tls:context>
+	 <http:request-config name="HTTP_Request_bplds" doc:name="HTTP Request configuration" doc:id="e31fa6df-d672-4263-90d9-32dd2675d2e6" basePath="${bpldsmembershipInfo.basePath}" >
+    <http:request-connection host="${bpldsmembershipInfo.host}" port="${bpldsmembershipInfo.port}" protocol="HTTPS" tlsContext="TLS_Context">
+		</http:request-connection>    
+  </http:request-config>
+	<wsc:config name="WSC_LEH" doc:name="Web Service Consumer Config" doc:id="35fc4c60-7ad3-45a7-838b-55856fb36d73" >
+		<wsc:connection wsdlLocation="${wsc.wsc_leh.wsdlLocation}" service="${wsc.wsc_leh.service}" port="${wsc.wsc_leh.port}" address="${wsc.wsc_leh.address}" >
+			<wsc:custom-transport-configuration >
+				<wsc:default-http-transport-configuration timeout="${wsc.wsc_leh.timeout}" />
+			</wsc:custom-transport-configuration>
+		</wsc:connection>
+	</wsc:config>
+	<wsc:config name="WSC_DCE" doc:name="Web Service Consumer Config" doc:id="dfffd123-5986-4628-b2fc-1d9c048c17d3" >
+		<wsc:connection wsdlLocation="${wsc.wsc_dce.wsdlLocation}" service="${wsc.wsc_dce.service}" port="${wsc.wsc_dce.port}" address="${wsc.wsc_dce.address}" >
+			<wsc:custom-transport-configuration >
+				<wsc:default-http-transport-configuration timeout="${wsc.wsc_dce.timeout}" />
+			</wsc:custom-transport-configuration>
+		</wsc:connection>
+	</wsc:config>
+	<configuration-properties doc:name="Common configuration" doc:id="84786391-a943-49ec-8513-648c3adb6319" file="configuration-common.yaml" />	
+	
+</mule>

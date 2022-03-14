@@ -1,0 +1,17 @@
+#%RAML 1.0 DataType
+uses:
+  standardTypes: ../exchange_modules/ada6332a-6827-4192-a43d-cf7babc8f2f4/metatypeslibrary/1.0.0/metaTypesLibrary.raml
+
+type: object
+properties:
+  headerArea:
+    type: standardTypes.reqHeaderAreaType
+  payloadArea:
+     type: object
+     properties:
+       eid: string
+       startDate?: date-only
+       endDate?: date-only
+       businessChannel?: string
+       rosterFlag: string
+       

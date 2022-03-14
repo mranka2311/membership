@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<sub-flow name="deterEligibility_createRequest" doc:id="2fbf2f88-0c78-4ab6-84a5-721e6e7ac30d" >
+		<ee:transform doc:name="dce request" doc:id="bd3a9047-61e3-4895-9c9c-42b0232fc2bb" >
+			<ee:message >
+				<ee:set-payload resource="mappings/logDceRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="buildLogMessage" doc:id="bfefd9d0-8b39-4579-b302-533b0d313b4b">
+
+			<ee:message>
+
+			</ee:message>
+
+			<ee:variables>
+
+				<ee:set-variable variableName="coreLoggingLogPayloadRequest"><![CDATA[%dw 2.0
+output application/xml
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	clientId: vars.originatingAppId,
+	logLevel: "INFO",
+	messageId: vars.messageId  default correlationId,
+	name: app.name,
+	logPoint: "Payload Request to DCE",
+	reason: "status: transformed payload to dce ws | flow: deterEligibility_createRequest",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: "SEV4",
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null,
+}]]></ee:set-variable>
+
+			</ee:variables>
+
+		</ee:transform>
+		<flow-ref doc:name="CoreLogging_main" doc:id="5430deb9-6592-4acf-824c-d85866a9e239" name="CoreLogging_main" target="CoreLoggingResponse"/>
+		<flow-ref doc:name="deterEligibility_callDCEWebService" doc:id="1acd16f7-f2d4-47b2-bd7b-71716920806a" name="deterEligibility_callDCEWebService"/>
+		<flow-ref doc:name="deterEligibility_responseMessageHandler" doc:id="f922bb8a-0dcf-4a50-bffb-49c1115785d6" name="deterEligibility_responseMessageHandler"/>
+	</sub-flow>
+	<flow name="deterEligibility_callDCEWebService" doc:id="8158b5e5-3148-4d70-b2d3-4d10df0a8672" >
+		<wsc:consume doc:name="call dce ws" doc:id="0b8cbad7-dfd1-45ab-a218-a1e12b8f31d4" config-ref="WSC_DCE" operation="${wsc.wsc_dce.operation}" target="response_dce" targetValue="#[payload.body]">
+			<wsc:transport-headers >
+				<wsc:transport-header key="authorization" value="#[vars.mtvBasicAuth]" />
+			</wsc:transport-headers>
+		</wsc:consume>
+		<ee:transform doc:name="Aggregate error response" doc:id="b207f579-f122-4160-bbae-46ef190cadcc" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+output application/java
+var respSysMsg = vars.response_dce.DeterEligibilityResponse.RespHeaderArea
+---
+
+if(respSysMsg.SystemMessage.Code == "S0000") 200 else if (respSysMsg.SystemMessage.Code == "S0006") 404 else if (respSysMsg.SystemMessage.Code == "S0003") 400 else if (respSysMsg.SystemMessage.Code == "S0009") 500 
+else if (respSysMsg.SystemMessage.Code == "S9999") 500
+else 503]]></ee:set-variable>
+				<ee:set-variable variableName="propagatedSystemMessages" ><![CDATA[%dw 2.0
+output application/json
+var respSysMsg = vars.response_dce.DeterEligibilityResponse.RespHeaderArea
+---
+if(respSysMsg.SystemMessage.Code != "S0000" and respSysMsg.SystemMessage.Code != "S0006") vars.propagatedSystemMessages +
+{ code: respSysMsg.SystemMessage.Code,
+additionalInfo: " Original SOURCE= " ++ respSysMsg.SystemMessage.Source default "" ++ " " ++ 
+(if(!isEmpty(respSysMsg.SystemMessage.AdditionalInfo))(respSysMsg.SystemMessage.AdditionalInfo default "")
+        else if(!isEmpty(respSysMsg.SystemMessage.Description))(respSysMsg.SystemMessage.Description default "")
+        
+        else ""),
+source: "GetEligbility"} else vars.propagatedSystemMessages]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="0695395b-4dc0-4f91-bc58-7b3b214f0ba1" >
+				<ee:transform doc:name="marker DCE" doc:id="292a3d84-d4f1-4b28-a7c5-1b0ad741eb80" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="marker" ><![CDATA["DCE"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<set-variable value="#[503]" doc:name="statusCode" doc:id="7873d82a-2da4-4eea-8a16-f741665480a1" variableName="statusCode"/>
+				<ee:transform doc:name="error message" doc:id="be6ad4d1-a5df-491b-aabf-bc8bbcb9aef6" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"systemMessage": [
+    {
+      "source": "DCE",
+      "code": "HTTP",
+      "additionalInfo":"Resource Unavailable."
+     }
+  ]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<sub-flow name="deterEligibility_responseMessageHandler" doc:id="4946f9f0-e9b2-4983-a31b-0b19caef42a2" >
+		
+		
+		<ee:transform doc:name="log response dce" doc:id="2d8d2d95-8835-4259-86a8-7d2b8efa1b54" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="coreLoggingLogPayloadRequest" ><![CDATA[%dw 2.0
+output application/json
+---
+vars.response_dce default ""]]></ee:set-variable>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest" ><![CDATA[%dw 2.0
+output application/json
+---
+{  
+	clientId: vars.originatingAppId,
+	logLevel: "INFO",
+	messageId: vars.messageId  default correlationId ,
+	name: app.name,
+	logPoint: "DCE Response",
+	reason: "status: DCE Response Received | flow: deterEligibility_responseMessageHandler",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: "SEV4",
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null,	
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="CoreLogging_main" doc:id="7a2da0c6-fda8-4a46-9460-c7686655cf4b" name="CoreLogging_main" target="CoreLoggingResponse"/>
+		<flow-ref doc:name="locateEligHist_errorHandling" doc:id="308d5ee7-4cf7-4cfb-964b-0b198ae9bdc3" name="locateEligHist_errorHandling" />
+		<choice doc:name="check success variable" doc:id="9f1c6c16-a515-465e-98d7-d57048a2c317" >
+			<when expression="#[vars.success != true]">
+				<ee:transform doc:name="error sysMsg_dce" doc:id="8c29c6d7-60c0-4861-b3d3-609bd7ff14bb" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="sysMsg_dceError" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+      	"source": vars.inputMarker,
+        "code": vars.coreExceptionHandlingResponse.systemMessage[0].code,
+      	additionalInfo: trim(vars.coreExceptionHandlingResponse.systemMessage[0].additionalInfo) default ""
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="dce full mapping" doc:id="2c4a6f04-8946-4abb-9239-2bd6f71fa903">
+			<ee:message>
+			</ee:message>
+					<ee:variables >
+						<ee:set-variable resource="mappings/logDceResponseMapping.dwl" variableName="tempDceStore" />
+					</ee:variables>
+		</ee:transform>
+				<ee:transform doc:name="update eid" doc:id="8ce30769-78c7-4216-a3d0-50c05189e5a3" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="tempDceStore" ><![CDATA[//(if(isNumeric($.memberId)) ($.memberId as Number) else $.memberId)
+%dw 2.0
+output application/json
+import isNumeric from dw::core::Strings
+fun skipOnEmpty(value) = value match {
+    case is Object -> filterKeyValuePairs(value)
+    case is Array -> $ map skipOnEmpty($) filter (not isEmpty($))
+    else -> value
+}
+fun filterKeyValuePairs(value) = value mapObject ((value,key) -> 
+    using(filteredValue = skipOnEmpty(value))
+    {
+      ((key): filteredValue) if (not isEmpty(filteredValue))
+    }
+)
+var eidOrig = vars.originalPayload.payloadArea.eid
+var date = vars.originalPayload.payloadArea.startDate
+var eer = vars.siLdsResponse filter ((if (($.contractEndDate != null) and ($.eid == eidOrig))(($.contractEndDate)  > date) else (1==1)))
+var x = flatten(vars.tempDceStore[0].memberDemographics map (item) ->
+  eer filter (((if(isNumeric(item.memberId)) (item.memberId as Number) else item.memberId) == (if(isNumeric($.memberId)) ($.memberId as Number) 
+  	else $.memberId
+  )) and (item.groupInfo.contractNumber == $.contractNumber) and (trim(item.personInfo.name.first) == trim($.firstName))
+  
+  //and (item.groupInfo.rawExtent == (if(($.sourceId == null) or (!($.sourceId contains "+"))) "" else (($.sourceId splitBy  "+")[1] ++ ($.sourceId splitBy  "+")[2])))
+  ) map (eerItem)  -> (item update {
+      case .eid! -> eerItem.eid
+  }))
+  
+
+---
+skipOnEmpty(if(!isEmpty(x))(vars.tempDceStore map (item) ->
+item  update {
+    case .memberDemographics! -> x
+}) else vars.tempDceStore)]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</sub-flow>
+</mule>

@@ -1,0 +1,83 @@
+#%RAML 1.0 Library
+types:
+  systemEnvironmentEnum: 
+    type :  string  
+    example : QA
+    description :  Indicates the environment in which to run the operation through.\nThis has multiple values to cover current and future TERI runways.\nPromotions normally move from TEST to SIT to QA/E2E to PROD. 
+    enum : [PROD,QA,E2E,E2E2,E2E3,E2E4,E2E5,E2E6,E2E7,E2E8,E2E9,E2E10,SIT,SIT2,SIT3,SIT4,SIT5,SIT6,SIT7,SIT8,SIT9,SIT10,TEST,TEST2,TEST3,TEST4,TEST5,TEST6,TEST7,TEST8,TEST9,TEST10]
+
+  systemMessageType:
+    type: object
+    properties:
+      source:
+        type: string
+        description: Name of the back-end system, which is the source of information
+      code:
+        type: string
+        description: Code representation of an attribute
+      subCode?:
+        type: string
+        description: Code from any other system
+      additionalInfo?:
+        type: string
+        description: >-
+          Additional technical information.  This field should be used instead
+          of appending information to the general Description associated with
+          the Code. 
+    additionalProperties: false
+    description: >-
+      Informational element that is used to provide an indication toward the
+      effectiveness of the request processing.
+
+  reqHeaderAreaType:
+    type: object
+    properties:
+      systemEnvironmentCode?:
+        type: systemEnvironmentEnum
+      messageId:
+        type: string
+        description: "\nThe MessageId provides a place to carry a Globally Unique Identifier (GUID) that will make each Schema instance uniquely identifiable.  \nThis is a critical success factor to enable software developers to use the Globally Unique Identifier (GUID) to build the following services or capabilities:\n1. Legally binding transactions,\n2. Transaction logging,\n3. Exception handling,\n4. Re-sending,\n5. Reporting,\n6. Confirmations,\n7. Security."      
+     # consumer?:
+     #   type: string
+     #   description: >-
+     #     Identifies characteristics and control identifiers that relate to the
+     #     application that created the message.
+      context?: array
+    additionalProperties: false
+
+  respHeaderAreaType:
+    type: object
+    properties:
+      systemEnvironmentCode?: 
+        type: systemEnvironmentEnum
+      messageId:
+        type: string
+        description: "\nThe MessageId provides a place to carry a Globally Unique Identifier (GUID) that will make each Schema instance uniquely identifiable.  \nThis is a critical success factor to enable software developers to use the Globally Unique Identifier (GUID) to build the following services or capabilities:\n1. Legally binding transactions,\n2. Transaction logging,\n3. Exception handling,\n4. Re-sending,\n5. Reporting,\n6. Confirmations,\n7. Security."
+      systemMessage:
+        type: systemMessageType[]
+  
+  respPaginationType:
+    type: object
+    properties:
+      maxRowsPerPage:
+        type: integer
+        description: Maximum number of rows that can be returned in one response/page. 
+      moreDataAvailable: boolean
+      pageID?: string
+      rowsReturned:
+        type: integer
+        description: Number of contracts returned in the response
+    additionalProperties: false
+    description:  This is used for long messages where response is broken down into multiple responces.
+
+  reqPaginationType:
+    type: object
+    properties:
+      maxRowsPerPage?: integer
+      needPagination: string
+      pageID?: string
+    additionalProperties: false
+    description:  This is used for large messages where response is broken down into multiple responces.
+
+  errorResponseType:
+    type: respHeaderAreaType

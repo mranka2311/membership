@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="locateEligHist_createRequest" doc:id="a3bf6c0f-93d7-4ca1-94e6-c8a84ccaee54" >
+		<ee:transform doc:name="leh request" doc:id="64065da8-2942-4183-9134-ff035f78fbfc" >
+			<ee:message >
+				<ee:set-payload resource="mappings/lehInitialRequest.dwl" />
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="lehHeader" ><![CDATA[%dw 2.0
+output application/xml skipNullOn="everywhere"
+ns wsse http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd
+// p('security.username') ++ ':' ++ p('secure::security.password')
+---
+headers:{
+wsse#Security: {
+wsse#UsernameToken: {
+wsse#Username: p('security.username'),
+wsse#Password: p('secure::security.password')
+}
+}}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="buildLogMessage" doc:id="8a1b6027-365b-4457-bc57-ebf80d4ddf7c">
+
+			<ee:message>
+
+			</ee:message>
+
+			<ee:variables>
+
+				<ee:set-variable variableName="coreLoggingLogPayloadRequest"><![CDATA[%dw 2.0
+output application/xml
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	clientId: vars.originatingAppId,
+	logLevel: "INFO",
+	messageId: vars.messageId  default correlationId,
+	name: app.name,
+	logPoint: "Payload Request to LEH",
+	reason: "status: transformed payload to leh ws | flow: locateEligHist_createRequest",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: "SEV4",
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null,
+}]]></ee:set-variable>
+
+			</ee:variables>
+
+		</ee:transform>
+		<flow-ref doc:name="CoreLogging_main" doc:id="a6161a48-5bb7-4bb4-917e-c3550b31ce16" name="CoreLogging_main" target="CoreLoggingResponse"/>
+
+	
+		<flow-ref doc:name="locateEligHist_callWebService" doc:id="24a70f6c-1b0a-4ad6-b22d-007f8207cc28" name="locateEligHist_callWebService"/>
+		<choice doc:name="Check Status Code" doc:id="57adebac-f557-47b1-b053-900160c8bfcb" >
+			<when expression='#[!(vars.statusCode == 200)]'>
+				<flow-ref doc:name="locateEligHist_responseMessageHandler" doc:id="06bf97e3-c317-4907-9a35-1a7056991921" name="locateEligHist_responseMessageHandler"/>
+			</when>
+			<otherwise >
+				<flow-ref doc:name="Flow ReferencelocateEligHist_twinCaseScenario" doc:id="56d97897-9946-4ad2-8c29-7d1e19d610f9" name="locateEligHist_twinCaseScenario"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	<flow name="locateEligHist_callWebService" doc:id="8216747f-b509-448a-be85-3a4beb2636cf" >
+		<wsc:consume doc:name="call LEH Web Service" doc:id="57038db6-1295-4fea-83cc-8526fc9c5795" config-ref="WSC_LEH" operation="${wsc.wsc_leh.operation}" target="response_leh" targetValue="#[payload.body]">
+			<wsc:transport-headers>
+				<wsc:transport-header key="authorization" value="#[vars.mtvBasicAuth]" />
+			</wsc:transport-headers>
+		</wsc:consume>
+		<ee:transform doc:name="Aggregate error response" doc:id="a000b3ec-f654-423e-92cc-1fb2b893c01b" >
+		<ee:message >
+		</ee:message>
+		<ee:variables >
+		<ee:set-variable variableName="statusCode" ><![CDATA[%dw 2.0
+		output application/java
+		var respSysMsg = vars.response_leh.LocateEligHistResponse.RespHeaderArea
+		---
+		
+		if(respSysMsg.SystemMessage.Code == "S0000") 200 else if (respSysMsg.SystemMessage.Code == "S0006") 404 else if (respSysMsg.SystemMessage.Code == "S0003") 400 else if (respSysMsg.SystemMessage.Code == "S0009") 500 else 503]]></ee:set-variable>
+		<ee:set-variable variableName="propagatedSystemMessages" ><![CDATA[%dw 2.0
+output application/java
+var respSysMsg = vars.response_leh.LocateEligHistResponse.RespHeaderArea
+---
+if(respSysMsg.SystemMessage.Code != "S0000" and respSysMsg.SystemMessage.Code != "S0006") (vars.propagatedSystemMessages +
+{ code: respSysMsg.SystemMessage.Code,
+additionalInfo: " Original SOURCE= " ++ respSysMsg.SystemMessage.Source default "" ++ " " ++ respSysMsg.SystemMessage.AdditionalInfo default "",
+source: "LocateHistories"}) 
+
+else if (respSysMsg.SystemMessage.Code == "S0006") (vars.propagatedSystemMessages + { 
+    source: "LocateHistories",
+    code: respSysMsg.SystemMessage.Code,
+additionalInfo: " Original SOURCE= " ++ respSysMsg.SystemMessage.Source default "" ++ " " ++ respSysMsg.SystemMessage.AdditionalInfo default ""
+})
+else vars.propagatedSystemMessages]]></ee:set-variable>
+		</ee:variables>
+		</ee:transform>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b0ba66f7-adda-446a-af79-f8b60bedb24d" >
+				<ee:transform doc:name="marker LEH" doc:id="d20211b4-943f-4157-9e14-2c7db09c1326" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="marker" ><![CDATA["LEH"]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<set-variable value="#[503]" doc:name="statusCode" doc:id="2d10e2a2-3837-4648-87c2-b56d886a45ee" variableName="statusCode"/>
+				<ee:transform doc:name="error message" doc:id="56acdfe3-a9ab-495c-9a64-d20fe6edf34c" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"systemMessage": [
+    {
+      "source": "LEH",
+      "code": "HTTP",
+      "additionalInfo":"Resource Unavailable."
+     }
+  ]]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<sub-flow name="locateEligHist_responseMessageHandler" doc:id="8ae5c7ba-1d69-44ef-b950-950946f627e2" >
+		<ee:transform doc:name="json payload" doc:id="698d01e3-ff14-43f3-95f1-ed71338e5e45" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.response_leh default ""]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Log Json Response" doc:id="3383fb94-78c8-4a52-b30d-158c9580ac31">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="coreLoggingLogPayloadRequest"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="coreLoggingLogMessageRequest" ><![CDATA[%dw 2.0
+output application/json
+---
+{  
+	clientId: vars.originatingAppId,
+	logLevel: "INFO",
+	messageId: vars.messageId  default correlationId ,
+	name: app.name,
+	logPoint: "LEH Response",
+	reason: "status: LEH Response Received | flow: locateEligHist_responseMessageHandler",
+	category: "standard",
+	originatingApp: vars.originatingAppId,
+	httpHeaders: attributes.headers default null,
+	appErrCode: null,
+	sev: "SEV4",
+	errSource: null,
+	errCode: null,
+	errSubCode: null,
+	errDesc: null,	
+}]]></ee:set-variable>
+			
+
+
+</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="CoreLogging_main" doc:id="5f06f6f3-90fa-435d-b718-86031c86b064" name="CoreLogging_main" target="CoreLoggingResponse"/>
+		
+		<flow-ref doc:name="locateEligHist_errorHandling" doc:id="96dd113d-6514-4312-9d30-eac73a4ecad1" name="locateEligHist_errorHandling"/>
+		<choice doc:name="check success variable" doc:id="04cf4736-76a1-4361-826f-21ba978bbad0" >
+			<when expression="vars.success != true">
+				<ee:transform doc:name="error sysMsg_leh" doc:id="9ae38832-b7bc-48af-bacf-57f52615cc18" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="sysMsg_lehError" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+      	"source": vars.inputMarker,
+        "code": vars.coreExceptionHandlingResponse.systemMessage[0].code,
+      	additionalInfo: trim(vars.coreExceptionHandlingResponse.systemMessage[0].additionalInfo) default ""
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<!-- <choice doc:name="check call again" doc:id="78da4e45-30b8-422b-9009-6268797cf565" >
+					<when expression="#[vars.callAgain]">
+						<flow-ref doc:name="locateEligHist_twinCaseScenario" doc:id="8c10ca29-1101-453e-bfaa-156472428595" name="locateEligHist_twinCaseScenario" />
+					</when>
+				</choice> -->
+				<ee:transform doc:name="eligibilityHistory" doc:id="38f77d5c-2d63-4226-a8eb-9f01141bb17d">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="finalEligibilityHistory" ><![CDATA[%dw 2.0
+output application/json
+
+var lehResponseTemp = payload.LocateEligHistResponse.Payload
+var EligHist = vars.finalEligibilityHistory
+---
+ {
+		"contractExistIndicator": lehResponseTemp.ContractExistIndicator,
+		"contractActiveIndicator": lehResponseTemp.ContractActiveIndicator,
+		"memberFoundIndicator": lehResponseTemp.MemberFoundIndicator,
+		"memberActiveIndicator": lehResponseTemp.MemberActiveIndicator,
+		"MultipleMembersFoundIndicator": lehResponseTemp.multipleMembersFoundIndicator,
+		"subscriberMismatch": lehResponseTemp.SubscriberMismatch,
+(eligibilityHistory:(lehResponseTemp.*EligibilityHistory map ((x, index) -> {
+		"effectiveDate": x.EffectiveDate default null,
+		"expirationDate": x.ExpirationDate default null,
+		"group": {
+		"groupNumber": x.Group.Number default null,
+		"groupSuffix": x.Group.Suffix default null
+		},
+		"subscriberName":{
+		"prefix":x.SubscriberName.Prefix default null,
+		"first": x.SubscriberName.First default null,
+		"last": x.SubscriberName.Last default null,
+		"middle": x.SubscriberName.Middle default null,
+		"suffix": x.SubscriberName.Suffix default null
+		},
+		
+		"member" : {
+		"sequenceNumber": x.Member.SequenceNumber default null,
+		"dateOfBirth": x.Member.DateOfBirth.Year ++ "-" ++ x.Member.DateOfBirth.Month ++ "-" ++ x.Member.DateOfBirth.Day default null,
+		"genderIndicator": x.Member.GenderIndicator default null,
+		"relationshipCode": x.Member.RelationshipCode default null,
+		"name" : {
+		"prefix": x.Member.Name.Prefix default null,
+		"first": x.Member.Name.First default null,
+		"last": x.Member.Name.Last default null,
+		"middle": x.Member.Name.Middle default null,
+		"suffix": x.Member.Name.Suffix default null
+		},
+		},
+		"memberMatchRating": x.MemberMatchRating default null,
+		"source": x.Source default null,
+		
+		"contract": {
+		"contractNumber": x.Contract.Number default null,
+		"alphaPrefix": x.Contract.AlphaPrefix default null,
+		"extent": x.Contract.Extent default null,	
+		}
+
+})
+))}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			
+</otherwise>
+		</choice>
+	</sub-flow>
+<sub-flow name="locateEligHist_twinCaseScenario" doc:id="afad087d-13ff-4433-a6cf-06a2f31466c3" >
+		<ee:transform doc:name="json payload" doc:id="9947d09e-716b-42a7-ab12-e610564767f8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+vars.response_leh default ""]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload.LocateEligHistResponse.Payload.MultipleMembersFoundIndicator]" doc:name="MultpleMembersFound" doc:id="35caf241-2320-4f73-9641-2389ec9b0fc3" variableName="MultpleMembersFound"/>
+<set-variable value="#[vars.ldsFinalPayload.payloadArea.personInfo[0].person[0].ssn]" doc:name="memberSsn" doc:id="f7a2ea66-2a19-4f0a-b811-7851156cbb44" variableName="memberSsn"/>
+<ee:transform doc:name="personInfo list" doc:id="757aba08-5215-4f88-9c94-2b4a3736ecce" >
+<ee:message >
+</ee:message>
+<ee:variables >
+<ee:set-variable variableName="personInfoList" ><![CDATA[%dw 2.0
+output application/json
+var ldsResponse = vars.ldsResp groupBy ($.contractNumber)
+var contractNumber = vars.ContractNumFromPair
+---
+ldsResponse[contractNumber]]]></ee:set-variable>
+</ee:variables>
+</ee:transform>
+<choice doc:name="check multiMember" doc:id="26429f0e-eb27-4c9b-993d-0f9b41dbdb31" >
+<when expression='#[(vars.MultpleMembersFound == "Y")]'>
+<foreach doc:name="For Each" doc:id="ff7af664-755e-4ec2-889e-e86f0f40606b" collection="#[vars.personInfoList]">
+<choice doc:name="check ssn match" doc:id="99639681-e5a7-4430-b057-998994b67d8b" >
+<when expression="#[(vars.memberSsn == payload.memberSSN) and vars.callAgain]">
+<ee:transform doc:name="sequence number" doc:id="0e78564f-a281-4a9c-8258-62911c8b4919" >
+<ee:message >
+</ee:message>
+<ee:variables >
+<ee:set-variable variableName="callAgain" ><![CDATA[false]]></ee:set-variable>
+									<ee:set-variable variableName="sequenceNumber" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.memberId]]></ee:set-variable>
+
+</ee:variables>
+</ee:transform>
+
+</when>
+</choice>
+
+</foreach>
+
+</when>
+
+</choice>
+		<choice doc:name="Check sequenceNumber" doc:id="41d9f7ef-0ec7-490d-843a-9da38483eb4a" >
+			<when expression="#[!(isBlank(vars.sequenceNumber))]">
+				<ee:transform doc:name="recreate request" doc:id="2e844d05-d1cd-4cf6-b34c-350dd47933f6">
+			<ee:message>
+						<ee:set-payload resource="mappings/lehRecreateRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+				<flow-ref doc:name="locateEligHist_callWebService" doc:id="95aa69a6-3325-498a-9ff4-a0ff66acd568" name="locateEligHist_callWebService" />
+			</when>
+		</choice>
+		<flow-ref doc:name="locateEligHist_responseMessageHandler" doc:id="1cb5b384-ec5c-440b-a3a8-bef74696dc28" name="locateEligHist_responseMessageHandler"/>
+	</sub-flow>
+	<sub-flow name="locateEligHist_errorHandling" doc:id="2e6ed6c3-b571-4792-962a-a2260919080f" >
+	<ee:transform doc:name="extract system and error code" doc:id="a13b2fe2-0d01-4908-92ca-e523fdd2b0fa">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+				<ee:set-variable variableName="coreExceptionHandlingRequest"><![CDATA[%dw 2.0
+output application/json
+var inputMarker = vars.marker
+var inputCode = (vars.statusCode)  default error.errorType
+
+---
+{  
+	inputMarker: inputMarker,
+	inputCode: inputCode 
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+		<flow-ref doc:name="CoreExceptionHandling_main" doc:id="4c1a1fbb-a8d3-47cd-848b-b7c707549ca9" name="CoreExceptionHandling_main" target="coreExceptionHandlingResponse" />
+		<ee:transform doc:name="set success" doc:id="472ba15b-04ca-4693-a9ff-77b470c75b94">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="success"><![CDATA[%dw 2.0
+output application/java
+---
+if (vars.coreExceptionHandlingResponse.httpStatus == "200" or vars.statusCode == 200) 
+true
+else
+false]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+	</sub-flow>
+	
+
+</mule>
